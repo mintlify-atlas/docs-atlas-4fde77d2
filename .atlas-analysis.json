@@ -1,0 +1,116 @@
+{
+  "projectType": "saas",
+  "projectName": "Seguridad",
+  "projectDescription": "Police security and incident management system for tracking crimes, operations, and generating statistical reports",
+  "theme": "linden",
+  "primaryColor": "#1e3a8a",
+  "lightColor": "#3b82f6",
+  "darkColor": "#1e40af",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "installation",
+              "getting-started"
+            ]
+          },
+          {
+            "group": "User Guides",
+            "pages": [
+              "guides/authentication",
+              "guides/user-roles",
+              "guides/navigation"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Features",
+        "groups": [
+          {
+            "group": "Incident Management",
+            "pages": [
+              "features/crime-reporting",
+              "features/preventivos",
+              "features/federal-crimes"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "features/operations-tracking",
+              "features/operational-reports",
+              "features/integrated-operations"
+            ]
+          },
+          {
+            "group": "Specialized Modules",
+            "pages": [
+              "features/traffic-accidents",
+              "features/homicides",
+              "features/vehicle-tracking",
+              "features/family-violence"
+            ]
+          },
+          {
+            "group": "Analytics & Reporting",
+            "pages": [
+              "features/statistics",
+              "features/maps",
+              "features/reports"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Administration",
+        "groups": [
+          {
+            "group": "System Administration",
+            "pages": [
+              "admin/user-management",
+              "admin/permissions",
+              "admin/regional-units"
+            ]
+          },
+          {
+            "group": "Configuration",
+            "pages": [
+              "admin/database-setup",
+              "admin/system-configuration"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Crime incident reporting and tracking",
+    "Traffic accident management",
+    "Operations and patrol tracking",
+    "Statistical analysis and visualization",
+    "Map-based incident visualization",
+    "Role-based access control for regional units",
+    "Vehicle and suspect database",
+    "Integrated reporting system"
+  ],
+  "publicApiSurface": [
+    "index.php - Main authentication entry point",
+    "alta_preventivos1.php - Crime incident form",
+    "registrar_operativo.php - Operations registration",
+    "consultaDelito.php - Crime statistics query",
+    "consultaMapaOperativos.php - Operations map view",
+    "accidenteTransito.php - Traffic accident form",
+    "homicidio.php - Homicide reporting",
+    "vehiculos_robados.php - Stolen vehicle tracking",
+    "consultaEstadistica.php - Statistical reports",
+    "buscarPreventivo.php - Incident search",
+    "alta_usuarios.php - User management",
+    "consultaParte.php - Daily reports query"
+  ]
+}
