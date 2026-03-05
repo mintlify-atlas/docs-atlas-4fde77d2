@@ -1,0 +1,211 @@
+---
+title: "Crime Statistics"
+description: "Query and analyze crime statistics with flexible filtering and export capabilities"
+icon: "chart-line"
+---
+
+The Seguridad system provides comprehensive statistical analysis tools for crime data, allowing users to generate detailed reports based on various criteria.
+
+## Overview
+
+The statistics module enables authorized users to query crime data across different time periods, geographic regions, and crime types. The system supports both detailed incident-level reporting and aggregated statistical summaries.
+
+## Statistical Query Features
+
+### Date Range Filtering
+
+Query crime data within specific date ranges:
+
+<ParamField path="desde" type="date" required>
+  Start date for the query range (format: DD-MM-YYYY or YYYY-MM-DD)
+</ParamField>
+
+<ParamField path="hasta" type="date" required>
+  End date for the query range (format: DD-MM-YYYY or YYYY-MM-DD)
+</ParamField>
+
+<Warning>
+  When querying with "TODOS" (all units/dependencies), the date range cannot exceed 12 months to prevent database overload.
+</Warning>
+
+### Geographic Filters
+
+<ParamField path="ur" type="select">
+  **Unidad Regional (Regional Unit)**
+  
+  Select a specific regional unit or "TODOS" for all units. Options are dynamically loaded from the `ur` table.
+</ParamField>
+
+<ParamField path="dependencia" type="select">
+  **Dependencia (Department/Station)**
+  
+  Cascading dropdown that loads departments based on the selected regional unit. Disabled until a unit is selected.
+</ParamField>
+
+### Crime Type Classification
+
+The system categorizes crimes into major groups:
+
+<AccordionGroup>
+  <Accordion title="Delitos Contra la Propiedad (Property Crimes)">
+    - Hurto (Theft)
+    - Hurto en Grado de Tentativa (Attempted Theft)
+    - Hurto de Ganados y Abigeato (Livestock Theft)
+    - Hurto de Automotores (Motor Vehicle Theft)
+    - Hurto de Motovehículo (Motorcycle Theft)
+    - Robo (Robbery)
+    - Robo Calificado (Aggravated Robbery)
+    - Daño (Property Damage)
+    - Estafas y Otras Defraudaciones (Fraud)
+    - Usurpación (Usurpation)
+    - Extorsión/Secuestro Virtual (Extortion/Virtual Kidnapping)
+  </Accordion>
+
+  <Accordion title="Delitos Contra las Personas (Crimes Against Persons)">
+    - Abandono de Persona (Abandonment)
+    - Amenazas (Threats)
+    - Lesiones Simples (Simple Injuries)
+    - Lesiones con Armas de Fuego (Firearm Injuries)
+    - Homicidios (Homicides)
+    - Homicidio con Arma Blanca (Stabbing Homicide)
+    - Homicidio con Arma de Fuego (Firearm Homicide)
+    - Suicidio (Suicide)
+    - Secuestro (Kidnapping)
+    - Motochorro (Motorcycle Robbery)
+  </Accordion>
+
+  <Accordion title="Delitos Contra la Integridad Sexual (Sexual Crimes)">
+    - Abuso Sexual Simple (Simple Sexual Abuse)
+    - Abuso Sexual sin Acceso Carnal (Sexual Abuse without Penetration)
+    - Abuso Sexual con Acceso Carnal (Sexual Abuse with Penetration)
+    - Corrupción de Menores (Corruption of Minors)
+    - Exhibiciones Obscenas (Indecent Exposure)
+  </Accordion>
+
+  <Accordion title="Other Crime Categories">
+    - Delitos Contra la Libertad (Crimes Against Freedom)
+    - Delitos Contra la Administración Pública (Crimes Against Public Administration)
+    - Delitos Contra el Orden Público (Crimes Against Public Order)
+    - Delitos Contra la Seguridad Pública (Crimes Against Public Safety)
+    - Delitos Contra el Honor (Crimes Against Honor)
+  </Accordion>
+</AccordionGroup>
+
+### Additional Filter Criteria
+
+<ParamField path="tipo_delito" type="select">
+  **Crime Type**
+  
+  Filter by specific crime type from the `tipo_delito` table, or select "TODOS" for all types.
+</ParamField>
+
+<ParamField path="modus_operandi" type="select">
+  **Modus Operandi**
+  
+  Filter by the method or pattern of crime execution. Options loaded from `modus_operandi_preventivos` table.
+</ParamField>
+
+<ParamField path="esclarecidos" type="select" default="T">
+  **Case Status**
+  
+  - `T`: TODOS (All cases)
+  - `S`: SI (Solved cases only)
+  - `N`: NO (Unsolved cases only)
+</ParamField>
+
+## Statistical Reports
+
+### Crime Statistics Report
+
+Accessed via `consultaDelito.php`, this report provides:
+
+- Detailed incident listings
+- Crime counts by type and location
+- Temporal analysis of crime patterns
+- Case clearance rates
+
+### General Statistics
+
+The `consultaEstadistica.php` module provides:
+
+- Monthly and annual crime summaries
+- Crime type breakdowns by unit
+- Comparative statistics across regions
+- Trend analysis over time
+
+### Monthly Statistical Forms
+
+The `planillas.php` system allows manual entry of monthly statistics organized by crime category, including:
+
+- Year and month selection
+- Regional unit assignment
+- Detailed crime counts by category
+- Solved cases (esclarecidos) tracking
+
+<Info>
+  Statistical forms use an accordion interface to organize the extensive list of crime categories, making data entry more manageable.
+</Info>
+
+## Data Export
+
+<Card title="Export Functionality" icon="download">
+  Reports can be exported in various formats:
+  
+  - PDF reports for official documentation
+  - Excel/CSV exports for further analysis
+  - Printable formatted views
+  
+  Export functions are typically accessed through the report results pages (`preventivos_detalle.php`, `resultadoDelito.php`).
+</Card>
+
+## Query Execution
+
+<Steps>
+  <Step title="Select Filters">
+    Choose the regional unit, department, date range, and crime type criteria for your query.
+  </Step>
+  
+  <Step title="Apply Additional Criteria">
+    Optionally filter by modus operandi and case status (solved/unsolved).
+  </Step>
+  
+  <Step title="Execute Query">
+    Click the "BUSCAR" (Search) button to generate the report. Results open in a new window.
+  </Step>
+  
+  <Step title="Review Results">
+    Analyze the detailed results table showing incidents matching your criteria.
+  </Step>
+  
+  <Step title="Export Data">
+    Use export functions to save or print the report for further use.
+  </Step>
+</Steps>
+
+## Database Schema
+
+The statistics module queries the following key tables:
+
+- `delitos` - Main crime incidents table
+- `tipo_delito` - Crime type classifications
+- `ur` - Regional units
+- `dependencia` - Police departments/stations
+- `modus_operandi_preventivos` - Crime methods/patterns
+
+## Performance Considerations
+
+<Warning>
+  Large queries (e.g., all units over extended periods) may take significant time to process. The system enforces a 12-month maximum for province-wide queries to maintain performance.
+</Warning>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Map Visualization" icon="map" href="/features/maps">
+    View crime statistics on interactive maps
+  </Card>
+  
+  <Card title="Reports" icon="file-lines" href="/features/reports">
+    Generate formatted reports and forms
+  </Card>
+</CardGroup>

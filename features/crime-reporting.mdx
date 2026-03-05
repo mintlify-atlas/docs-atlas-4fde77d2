@@ -1,0 +1,490 @@
+---
+title: 'Crime Reporting'
+description: 'Learn how to create and manage crime incident reports in the Seguridad system'
+icon: 'file-police'
+---
+
+## Overview
+
+The Crime Reporting module allows law enforcement personnel to create detailed incident reports (preventivos judiciales) with comprehensive information about crimes, suspects, victims, and evidence.
+
+## Creating a Crime Report
+
+<Steps>
+  <Step title="Access the Report Form">
+    Navigate to the crime reporting form (`alta_preventivos1.php`) from the main menu.
+  </Step>
+  
+  <Step title="Enter Basic Information">
+    Fill in the required preventivo details including number, year, and dependency information.
+  </Step>
+  
+  <Step title="Complete Crime Details">
+    Provide comprehensive information about the incident, location, and involved parties.
+  </Step>
+  
+  <Step title="Upload Attachments">
+    Add any relevant photos or documents to support the report.
+  </Step>
+  
+  <Step title="Submit the Report">
+    Review and submit the preventivo for processing.
+  </Step>
+</Steps>
+
+## Required Fields
+
+### Report Identification
+
+<ParamField path="nro_preventivo" type="number" required>
+  The preventivo number assigned to this incident report
+</ParamField>
+
+<ParamField path="anio_preventivo" type="number" required>
+  The year of the preventivo (automatically defaults to current year)
+</ParamField>
+
+<ParamField path="dependencia" type="select" required>
+  The police dependency/station handling the case. Selected from available dependencies in your regional unit.
+</ParamField>
+
+### Date and Time Information
+
+<ParamField path="fecha_preventivo" type="date" required>
+  Date when the preventivo was created. Must be:
+  - Not in a closed period
+  - Not in the future
+  - Within the last year
+</ParamField>
+
+<ParamField path="fecha_hecho" type="date" required>
+  Date when the crime actually occurred
+</ParamField>
+
+<ParamField path="horario_hecho" type="select" required>
+  Time range when the incident occurred. Options include:
+  - 00:00 - 02:00
+  - 02:00 - 04:00
+  - 04:00 - 06:00
+  - And so on in 2-hour intervals through 22:00 - 24:00
+</ParamField>
+
+### Complainant Information
+
+<ParamField path="denunciante" type="text">
+  Name of the person filing the complaint
+</ParamField>
+
+<ParamField path="tipoDoc" type="select">
+  Type of identification document
+</ParamField>
+
+<ParamField path="dni" type="text">
+  Identification document number of the complainant
+</ParamField>
+
+### Suspect/Author Information
+
+<ParamField path="sospechosos" type="text">
+  Names or descriptions of suspects (up to 75 characters)
+</ParamField>
+
+<ParamField path="inculpado" type="select" required>
+  Whether the suspect is:
+  - CONOCIDO (Known)
+  - DESCONOCIDO (Unknown)
+</ParamField>
+
+<ParamField path="sexo_inculpado" type="select" required>
+  Sex of the suspect:
+  - MASCULINO
+  - FEMENINO
+  - NO CONSTA (Not stated)
+</ParamField>
+
+<ParamField path="genero_inculpado" type="select" required>
+  Gender identity of the suspect (from `identidad_genero` catalog)
+</ParamField>
+
+<ParamField path="edad_inculpado" type="select" required>
+  Age range of the suspect:
+  - MENOR DE 16 (Under 16)
+  - DE 16 A 17 AÑOS (16 to 17 years)
+  - MAYOR DE 18 AÑOS (Over 18 years)
+  - NO CONSTA (Not stated)
+</ParamField>
+
+### Victim Information
+
+<ParamField path="sexo_victima" type="select" required>
+  Sex of the victim:
+  - MASCULINO
+  - FEMENINO
+  - NO CONSTA
+</ParamField>
+
+<ParamField path="genero_victima" type="select" required>
+  Gender identity of the victim
+</ParamField>
+
+<ParamField path="edad_victima" type="number" required>
+  Age of the victim in years
+</ParamField>
+
+<ParamField path="vinculo_imputado_victima" type="select" required>
+  Relationship between suspect and victim:
+  - 1 - CONYUGE/PAREJA (Spouse/Partner)
+  - 2 - EX CONYUGE/EX PAREJA (Ex-spouse/Ex-partner)
+  - 3 - HIJO/A (Son/Daughter)
+  - 4 - HERMANO/A (Sibling)
+  - 5 - PADRE/MADRE (Father/Mother)
+  - 6 - OTROS VINCULOS (Other relationships)
+  - 7 - SOCIO/A (Business partner)
+  - 8 - EMPLEADO (Employee)
+  - 9 - EMPLEADOR (Employer)
+  - 10 - CLIENTE (Client)
+  - 11 - OTRAS RELACIONES NO FAMILIARES (Other non-family relations)
+  - 12 - SIN RELACION (No relation)
+</ParamField>
+
+## Crime Categorization
+
+### Type of Crime
+
+<ParamField path="hecho" type="select" required>
+  Select the type of crime from the `tipos_delitos` catalog. Common categories include:
+  - Crimes against persons (DEL.C/LAS PERSONAS)
+  - Crimes against property (DEL.C/LA PROPIEDAD)
+  - Sex crimes (DEL.C/INTEG.SEXUAL)
+  - Other crimes (OTROS)
+</ParamField>
+
+<ParamField path="modusoperandi" type="select" required>
+  Select the modus operandi from the `modus_operandi_preventivos` catalog describing how the crime was committed
+</ParamField>
+
+<ParamField path="esclarecido" type="select" required>
+  Whether the crime has been solved:
+  - SI (Yes)
+  - NO (No)
+</ParamField>
+
+<ParamField path="motivo_origina_instruccion_causa" type="select" required>
+  What initiated the investigation:
+  - DENUNCIA PARTICULAR (Private complaint)
+  - INTERVENCION POLICIAL (Police intervention)
+  - ORDEN JUDICIAL (Court order)
+  - OTROS (Other)
+</ParamField>
+
+### Recovery of Stolen Items
+
+<ParamField path="recupero_sustraido" type="select">
+  Whether stolen items were recovered
+</ParamField>
+
+## Location Information
+
+### Geographic Coordinates
+
+<ParamField path="lat" type="text" required>
+  Latitude coordinate of the incident location (selected on map)
+</ParamField>
+
+<ParamField path="long" type="text" required>
+  Longitude coordinate of the incident location (selected on map)
+</ParamField>
+
+<ParamField path="direccion_gps" type="text">
+  GPS address of the incident location
+</ParamField>
+
+<Warning>
+  You must select coordinates on the map before submitting the report. The system will validate that both latitude and longitude are provided.
+</Warning>
+
+### Location Details
+
+<ParamField path="lugar" type="text" required>
+  Descriptive name of the location where the incident occurred
+</ParamField>
+
+<ParamField path="tipo_lugar_hecho" type="select" required>
+  Type of location:
+  - DOMICILIO PARTICULAR (Private residence)
+  - DOMICILIO LABORAL (Workplace)
+  - LOCAL COMERCIAL PUBLICO (Public commercial establishment)
+  - ESTABLECIMIENTO ESCOLAR (School)
+  - ESTABLECIMIENTO SALUD - HOSPITAL (Health facility/Hospital)
+  - OFICINA PUBLICA (Public office)
+  - CAMPO - CHACRA (Field/Farm)
+  - VIA PUBLICA (Public street)
+  - SIN DETERMINAR (Undetermined)
+</ParamField>
+
+<ParamField path="zona" type="select" required>
+  Zone type:
+  - URBANA (Urban)
+  - RURAL (Rural)
+</ParamField>
+
+<ParamField path="barrio_chacra" type="text" required>
+  Neighborhood or farm name
+</ParamField>
+
+### Street Address
+
+<ParamField path="tipo_via_lugar_hecho" type="select" required>
+  Type of road:
+  - R.N. (National Route)
+  - R.P. (Provincial Route)
+  - AUTOVIA (Highway)
+  - AVENIDA (Avenue)
+  - CALLE (Street)
+  - NO CONSTA (Not stated)
+</ParamField>
+
+<ParamField path="calle_lugar_hecho" type="text" required>
+  Street name
+</ParamField>
+
+<ParamField path="altura_lugar_hecho" type="text" required>
+  Street number/height
+</ParamField>
+
+<ParamField path="interseccion_lugar_hecho" type="text" required>
+  Intersecting street
+</ParamField>
+
+<ParamField path="nro_casa_lugar_hecho" type="text" required>
+  House/building number
+</ParamField>
+
+## Judicial Information
+
+<ParamField path="circunscripcion_judicial" type="select" required>
+  Judicial circuit:
+  - PRIMERA CIRCUNSCRIPCION JUDICIAL (POSADAS)
+  - SEGUNDA CIRCUNSCRIPCION JUDICIAL (OBERA)
+  - TERCERA CIRCUNSCRIPCION JUDICIAL (ELDORADO)
+  - CUARTA CIRCUNSCRIPCION JUDICIAL (PUERTO RICO)
+</ParamField>
+
+<ParamField path="juzgado" type="select" required>
+  Court of instruction assigned to the case (dynamically populated based on circuit)
+</ParamField>
+
+<ParamField path="secretaria" type="select" required>
+  Secretary office assigned to the case (dynamically populated based on court)
+</ParamField>
+
+## Detention Information
+
+<ParamField path="detenido" type="select">
+  Whether there were any detentions
+</ParamField>
+
+<ParamField path="cantidad_detenidos" type="number">
+  Total number of people detained
+</ParamField>
+
+<ParamField path="detenido_masculino" type="number">
+  Number of male detainees
+</ParamField>
+
+<ParamField path="detenido_femenino" type="number">
+  Number of female detainees
+</ParamField>
+
+<ParamField path="detenido_menor_18" type="number">
+  Number of detainees under 18 years old
+</ParamField>
+
+<ParamField path="detenido_mayor_18" type="number">
+  Number of detainees 18 years or older
+</ParamField>
+
+## Special Case Fields
+
+### Traffic Fatalities
+
+For traffic-related deaths, additional fields are required:
+
+<ParamField path="semaforo_muerte_vial" type="select">
+  Traffic light status:
+  - 1 - FUNCIONABA (Working)
+  - 2 - NO FUNCIONABA (Not working)
+  - 3 - SIN SEMAFORO (No traffic light)
+  - 4 - INTERMITENTE (Flashing)
+  - 99 - SIN DETERMINAR (Undetermined)
+</ParamField>
+
+<ParamField path="modo_muerte_vial" type="select">
+  Mode of traffic death (collision type)
+</ParamField>
+
+<ParamField path="condicion_climatica_muerte_vial" type="select">
+  Weather conditions at time of incident
+</ParamField>
+
+<ParamField path="clase_victima_muerte_vial" type="select">
+  Victim classification (driver, passenger, pedestrian, etc.)
+</ParamField>
+
+<ParamField path="vehiculo_victima_muerte_vial" type="select">
+  Type of vehicle involved
+</ParamField>
+
+### Homicides
+
+For homicide cases, additional fields are required:
+
+<ParamField path="arma_utilizada_homicidos_dolosos" type="select">
+  Weapon used:
+  - 1 - ARMA DE FUEGO (Firearm)
+  - 2 - ARMA BLANCA (Knife/blade)
+  - 5 - OBJETO CONTUNDENTE (Blunt object)
+  - And other options
+</ParamField>
+
+<ParamField path="ocasion_delito_homicidos_dolosos" type="select">
+  Circumstance/occasion of the homicide
+</ParamField>
+
+### Suicides
+
+For suicide cases:
+
+<ParamField path="modalidad_suicidios" type="select">
+  Method used in suicide
+</ParamField>
+
+<ParamField path="sexo_suicida_suicidios" type="select">
+  Sex of the deceased
+</ParamField>
+
+<ParamField path="edad_suicida" type="text">
+  Age of the deceased
+</ParamField>
+
+## Additional Information
+
+<ParamField path="extracto_preventivo" type="textarea">
+  Summary or extract of the preventivo report
+</ParamField>
+
+## Photo/Document Attachments
+
+The system supports uploading one photo per preventivo:
+
+<Steps>
+  <Step title="Select File">
+    Use the file upload field to select an image file
+  </Step>
+  
+  <Step title="File Naming">
+    The file will be automatically renamed to: `{nro_preventivo}-{anio_preventivo}-{dependencia}-{original_filename}`
+  </Step>
+  
+  <Step title="Storage">
+    Files are stored in the `../fotos/` directory and referenced in the `fotografias` table
+  </Step>
+</Steps>
+
+## Special Vehicle Cases
+
+For motorcycle theft (`HURTO MOTOCICLETA`) or vehicle theft (`HURTO/ROBO AUTOMOTOR`), additional vehicle information is required:
+
+<ParamField path="nro" type="text">
+  License plate number (numeric part)
+</ParamField>
+
+<ParamField path="letra" type="text">
+  License plate letters
+</ParamField>
+
+<ParamField path="marca" type="text">
+  Vehicle brand/make
+</ParamField>
+
+<ParamField path="motor" type="text">
+  Engine number
+</ParamField>
+
+<ParamField path="chasis" type="text">
+  Chassis number
+</ParamField>
+
+<Info>
+  When a vehicle theft is reported, the system automatically creates an entry in the `vehiculos_robados` (stolen vehicles) table for tracking purposes.
+</Info>
+
+## Validation Rules
+
+<Warning>
+  The system enforces several validation rules:
+  
+  - **Period Closure**: Cannot create preventivos for dates in closed periods
+  - **Future Dates**: Cannot create preventivos with future dates
+  - **Date Range**: Preventivo date must be within the last year
+  - **Duplicate Check**: System checks for duplicate preventivos (same number, year, and dependency)
+  - **Required Selections**: All dropdown fields marked as required must be selected
+  - **Coordinates**: Map coordinates are mandatory
+</Warning>
+
+## Updating Reports
+
+Existing preventivos can be updated by:
+
+1. Searching for the preventivo using its number, year, and dependency
+2. The system will load the existing data
+3. Modify the necessary fields (primarily coordinates and modus operandi)
+4. Submit to update
+
+<Note>
+  The update functionality is limited to certain fields. Core incident data cannot be modified after initial creation.
+</Note>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Accurate Location Data">
+    Always use the map interface to select precise coordinates. This data is used for spatial analysis and crime mapping.
+  </Accordion>
+  
+  <Accordion title="Complete Victim/Suspect Information">
+    Provide as much detail as possible about victims and suspects, including age, sex, and gender identity. This information is crucial for statistical reporting.
+  </Accordion>
+  
+  <Accordion title="Timely Reporting">
+    Create preventivos as soon as possible after the incident. Remember that dates cannot be in closed periods or be too far in the past.
+  </Accordion>
+  
+  <Accordion title="Proper Classification">
+    Select the most specific crime type and modus operandi available. This ensures accurate crime statistics and trend analysis.
+  </Accordion>
+  
+  <Accordion title="Vehicle Information">
+    For vehicle-related crimes, ensure all identification numbers (license plate, chassis, engine) are entered correctly for tracking in the stolen vehicles database.
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Preventivos Management" icon="folder-open" href="/features/preventivos">
+    Learn about searching and managing preventivo records
+  </Card>
+  
+  <Card title="Federal Crimes" icon="landmark" href="/features/federal-crimes">
+    Special handling for federal crime cases
+  </Card>
+  
+  <Card title="Vehicle Tracking" icon="car" href="/features/vehicle-tracking">
+    Managing stolen vehicle records
+  </Card>
+  
+  <Card title="Maps & Analytics" icon="map" href="/features/maps">
+    Using crime location data for analysis
+  </Card>
+</CardGroup>

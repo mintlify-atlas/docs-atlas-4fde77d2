@@ -1,0 +1,442 @@
+---
+title: User Roles
+description: Understanding user roles and permission levels in the Seguridad system
+icon: users
+---
+
+## Overview
+
+The Seguridad system implements a comprehensive role-based access control (RBAC) system that assigns users to specific roles based on their organizational unit, function, and security clearance. Each role determines which modules, features, and data the user can access.
+
+## Permission Structure
+
+Roles are defined by the `permisos` field in the `usuario` table. This field contains either numeric codes or text identifiers that map to specific modules and access levels.
+
+<Info>
+  The permission code is set during user creation and can be modified by administrators through the user management interface (`alta_usuarios.php`).
+</Info>
+
+## Role Categories
+
+### Administrator Roles
+
+<Card title="System Administrator" icon="crown">
+  **Permission Code:** `0`  
+  **Landing Page:** `index1.php`  
+  **Description:** Full system access with administrative privileges
+  
+  **Capabilities:**
+  - Access to all modules and features
+  - User management and role assignment
+  - System-wide data access
+  - Configuration management
+</Card>
+
+<Card title="Administrative Staff" icon="user-tie">
+  **Permission Code:** `100`  
+  **Landing Page:** `admin/cabecera1.php`  
+  **Description:** Administrative operations and oversight
+  
+  **Capabilities:**
+  - Administrative module access
+  - User oversight functions
+  - Cross-regional data visibility
+</Card>
+
+### Regional Unit Roles
+
+Regional Units (Unidades Regionales) are the primary operational divisions. Each UR has dedicated access to their regional data:
+
+<Tabs>
+  <Tab title="UR 1-5">
+    | Unit | Code | Landing Page |
+    |------|------|-------------|
+    | **UR 1** | `1` | `ur1/cabecera1.php` |
+    | **UR 2** | `2` | `ur2/cabecera1.php` |
+    | **UR 3** | `3` | `ur3/cabecera1.php` |
+    | **UR 4** | `4` | `ur4/cabecera1.php` |
+    | **UR 5** | `5` | `ur5/cabecera1.php` |
+  </Tab>
+  
+  <Tab title="UR 6-10">
+    | Unit | Code | Landing Page |
+    |------|------|-------------|
+    | **UR 6** | `6` | `ur6/cabecera1.php` |
+    | **UR 7** | `7` | `ur7/cabecera1.php` |
+    | **UR 8** | `8` | `ur8/cabecera1.php` |
+    | **UR 9** | `9` | `ur9/cabecera1.php` |
+    | **UR 10** | `10` | `ur10/cabecera1.php` |
+  </Tab>
+  
+  <Tab title="UR 11-15">
+    | Unit | Code | Landing Page |
+    |------|------|-------------|
+    | **UR 11** | `11` | `ur11/cabecera1.php` |
+    | **UR 12** | `12` | `ur12/cabecera1.php` |
+    | **UR 13** | `13` | `ur13/cabecera1.php` |
+    | **UR 14** | `14` | `ur14/cabecera1.php` |
+    | **UR 15** | `15` | `ur15/cabecera1.php` |
+  </Tab>
+</Tabs>
+
+<Note>
+  Each Regional Unit has identical functionality but operates on data specific to their geographic jurisdiction.
+</Note>
+
+### Judicial Personnel Roles
+
+Judicial roles provide read-only consultation access to case data for court officials:
+
+<AccordionGroup>
+  <Accordion title="General Consultation Access">
+    **Permission Codes:** `20`, `200`  
+    **Landing Pages:** `consulta/index1.php`, `consulta2/index1.php`
+    
+    Provides general consultation capabilities for judicial review and case oversight.
+  </Accordion>
+  
+  <Accordion title="First Circumscription Courts">
+    Courts serving the first judicial circumscription:
+    
+    | Court | Code | Landing Page |
+    |-------|------|-------------|
+    | **Juzgado 1** | `21` | `primera_circuncripcion/juzgado1/menu_consulta.php` |
+    | **Juzgado 2** | `22` | `primera_circuncripcion/juzgado2/menu_consulta.php` |
+    | **Juzgado 3** | `23` | `primera_circuncripcion/juzgado3/menu_consulta.php` |
+    | **Juzgado 4** | `24` | `primera_circuncripcion/juzgado4/menu_consulta.php` |
+    | **Juzgado 5** | `25` | `primera_circuncripcion/juzgado5/menu_consulta.php` |
+    | **Juzgado 6** | `26` | `primera_circuncripcion/juzgado6/menu_consulta.php` |
+    | **Juzgado 7** | `27` | `primera_circuncripcion/juzgado7/menu_consulta.php` |
+  </Accordion>
+  
+  <Accordion title="Third Circumscription Court">
+    **Permission Code:** `28`  
+    **Landing Page:** `tercera_circuncripcion/juzgado3/menu_consulta.php`
+    
+    Consultation access for the third judicial circumscription.
+  </Accordion>
+</AccordionGroup>
+
+### Specialized Department Roles
+
+Specialized units handle specific types of cases and investigations:
+
+<CardGroup cols={2}>
+  <Card title="Traffic Department" icon="car">
+    **Code:** `99`  
+    **Page:** `transito/index1.php`
+    
+    Traffic accident investigations and vehicle-related incidents.
+  </Card>
+  
+  <Card title="Suicide Investigation" icon="head-side-medical">
+    **Code:** `98`  
+    **Page:** `suicidio/index1.php`
+    
+    Specialized unit for suicide case investigation and documentation.
+  </Card>
+  
+  <Card title="Traffic Homicide" icon="ambulance">
+    **Code:** `97`  
+    **Page:** `homicidio_accidente_transito/index1.php`
+    
+    Investigations of fatalities resulting from traffic incidents.
+  </Card>
+  
+  <Card title="Dependent Resources" icon="users-medical">
+    **Code:** `96`  
+    **Page:** `recursos_dependientes/index1.php`
+    
+    Management of dependent personnel and resources.
+  </Card>
+  
+  <Card title="Home Escape Cases" icon="house-leave">
+    **Code:** `95`  
+    **Page:** `fuga_hogar/index1.php`
+    
+    Missing persons and runaway cases.
+  </Card>
+  
+  <Card title="UNICEF Unit" icon="child">
+    **Code:** `94`  
+    **Page:** `unicef/index1.php`
+    
+    Child protection cases coordinated with UNICEF.
+  </Card>
+  
+  <Card title="Toxicology" icon="flask">
+    **Code:** `93`  
+    **Page:** `toxico/cabecera1.php`
+    
+    Drug-related crimes and toxicology investigations.
+  </Card>
+  
+  <Card title="Subsecretaría" icon="building">
+    **Code:** `92`  
+    **Page:** `subsecretaria/index1.php`
+    
+    Undersecretary office operations and oversight.
+  </Card>
+  
+  <Card title="Data Entry Unit" icon="keyboard">
+    **Code:** `91`  
+    **Page:** `carga_datos/index1.php`
+    
+    Dedicated data entry and records management.
+  </Card>
+  
+  <Card title="Operations" icon="radar">
+    **Code:** `90`  
+    **Page:** `operaciones/index1.php`
+    
+    Operational planning and tactical operations.
+  </Card>
+</CardGroup>
+
+### Federal Crimes Unit
+
+<Card title="Federal Crimes Department" icon="landmark">
+  **Permission Code:** `4444`  
+  **Landing Page:** `delitos-federales/index1.php`  
+  **Description:** Federal-level crime investigation and prosecution support
+  
+  **Jurisdiction:**
+  - Federal crimes
+  - Cross-jurisdictional cases
+  - Federal law enforcement coordination
+</Card>
+
+### Special Access Roles
+
+These roles provide limited access to specific functions:
+
+<Tabs>
+  <Tab title="Query Functions">
+    | Role | Code | Landing Page | Function |
+    |------|------|--------------|----------|
+    | **Vehicle Search** | `800` | `buscar_dominio.php` | Search vehicle by license plate |
+    | **Preventive Records** | `801` | `buscarpreventivosoloconsultas.php` | Query preventive records |
+    | **Map Consultation** | `807` | `consultaMapa.php` | Geographic data visualization |
+  </Tab>
+  
+  <Tab title="Operational Functions">
+    | Role | Code | Landing Page | Function |
+    |------|------|--------------|----------|
+    | **Domestic Violence** | `802` | `operaciones/violencia_familiar.php` | Domestic violence cases |
+    | **Operations Module** | `803` | `operativos/index.php` | Operational activities |
+    | **Internal Affairs** | `804` | `asuntos_i/cabecera1.php` | Internal investigations |
+    | **Road Safety** | `805` | `seguridad_vial/cabecera1.php` | Road safety programs |
+    | **Vehicle Verification** | `806` | `verificacion_automotor/cabecera1.php` | Vehicle inspection records |
+  </Tab>
+</Tabs>
+
+### Text-Based Roles
+
+Some roles use text identifiers instead of numeric codes:
+
+<AccordionGroup>
+  <Accordion title="Deputy Chief (Sub-jefe)">
+    **Permission Code:** `Sub-jefe`  
+    **Landing Page:** `consulta_mapa_simple.php`  
+    **Description:** Deputy chief access with map-based oversight capabilities
+  </Accordion>
+  
+  <Accordion title="Security Director (dirseguridad)">
+    **Permission Code:** `dirseguridad`  
+    **Landing Page:** `dirgral/index1.php`  
+    **Description:** Director-level access to security operations and strategic planning
+  </Accordion>
+  
+  <Accordion title="Police Station (comisaria)">
+    **Permission Code:** `comisaria`  
+    **Landing Page:** `comisarias/cabecera1.php`  
+    **Description:** Local police station operations and community policing
+  </Accordion>
+  
+  <Accordion title="Operations (operaciones)">
+    **Permission Code:** `operaciones`  
+    **Landing Page:** `operativos`  
+    **Description:** Operational management and field operations coordination
+  </Accordion>
+</AccordionGroup>
+
+## Role Assignment Process
+
+Administrators assign roles through the user management interface:
+
+<Steps>
+  <Step title="Access User Management">
+    Navigate to **CARGA DE DATOS** > **Usuarios** or directly to `alta_usuarios.php`
+  </Step>
+  
+  <Step title="Create or Select User">
+    - Click **Nuevo** for new users
+    - Click **Modificar** next to existing users to edit
+  </Step>
+  
+  <Step title="Enter User Information">
+    Required fields:
+    - Username (lowercase, max 16 characters)
+    - Password and confirmation
+    - Description/Initials
+    - Circunscripción (jurisdiction)
+    - **Categoria** (permission code)
+  </Step>
+  
+  <Step title="Set Permission Code">
+    Enter the appropriate numeric or text permission code in the **Categoria** field
+  </Step>
+  
+  <Step title="Optional: Set Data Entry Authorization">
+    Configure "Autorizar carga fuera Periodo" to restrict data entry before a specific date
+  </Step>
+  
+  <Step title="Save User">
+    Click **Guardar** for new users or **Modificar** to update existing users
+  </Step>
+</Steps>
+
+<Warning>
+  Only users with administrative privileges (code `0` or `100`) can access the user management interface.
+</Warning>
+
+## Permission Features
+
+### Data Entry Period Restriction
+
+Administrators can restrict when users can enter data:
+
+```php
+// Field: autorizado_carga_fuera_periodo
+// Format: dd-mm-yyyy (e.g., 01-01-2016)
+// Effect: Users cannot enter data dated before this date
+```
+
+<Info>
+  This feature helps maintain data quality by preventing backdated entries without authorization.
+</Info>
+
+### Bulk Permission Management
+
+Administrators can disable data entry for all users simultaneously:
+
+<Card title="Batch Period Restriction" icon="users-slash">
+  The "Inhabilitar CFP a TODOS" button in user management allows administrators to set a global data entry restriction date for all users except administrators.
+  
+  **Use Case:** End-of-period data freezes for reporting or auditing
+</Card>
+
+## User Attributes
+
+Each user account includes the following attributes:
+
+<CardGroup cols={2}>
+  <Card title="Username (usd)" icon="user">
+    Unique identifier, lowercase, max 16 characters
+  </Card>
+  
+  <Card title="Password (pwd)" icon="key">
+    Authentication credential, max 16 characters
+  </Card>
+  
+  <Card title="Permissions (permisos)" icon="shield">
+    Role code determining access level
+  </Card>
+  
+  <Card title="Circunscripción" icon="map-location">
+    Geographic jurisdiction assignment
+  </Card>
+  
+  <Card title="Nota/Description" icon="note-sticky">
+    User description or full name
+  </Card>
+  
+  <Card title="Authorization Date" icon="calendar">
+    Data entry period restriction
+  </Card>
+</CardGroup>
+
+## Viewing User List
+
+The user management page displays all users with their key attributes:
+
+```
+Format: Username > Permissions > Circunscripción > Nota > Authorization Date
+Example: jdoe > 1 > UR1 Posadas > John Doe > 01-01-2024
+```
+
+Users are sorted by:
+1. Authorization date
+2. Username (alphabetically)
+
+## Common Role Scenarios
+
+<Tabs>
+  <Tab title="Regional Officer">
+    **Scenario:** Police officer working in Regional Unit 5
+    
+    **Configuration:**
+    - **Username:** `oficial.ur5`
+    - **Permission Code:** `5`
+    - **Circunscripción:** `UR5 Oberá`
+    - **Access:** Full CRUD operations for UR5 preventive reports
+  </Tab>
+  
+  <Tab title="Court Official">
+    **Scenario:** Administrative staff at First Circumscription Court 3
+    
+    **Configuration:**
+    - **Username:** `juzgado3.consulta`
+    - **Permission Code:** `23`
+    - **Circunscripción:** `Primera Circunscripción`
+    - **Access:** Read-only consultation of court-related cases
+  </Tab>
+  
+  <Tab title="Specialized Investigator">
+    **Scenario:** Investigator in the Toxicology unit
+    
+    **Configuration:**
+    - **Username:** `toxico.investigador`
+    - **Permission Code:** `93`
+    - **Circunscripción:** `Unidad Toxicología`
+    - **Access:** Drug-related case management and investigation tools
+  </Tab>
+  
+  <Tab title="System Administrator">
+    **Scenario:** IT staff managing the system
+    
+    **Configuration:**
+    - **Username:** `admin.sistema`
+    - **Permission Code:** `0`
+    - **Circunscripción:** `Administración Central`
+    - **Access:** Full system access, user management, all modules
+  </Tab>
+</Tabs>
+
+## Role Security Considerations
+
+<Warning>
+  **Important Security Notes:**
+  
+  - Permission codes are stored and compared as plain text
+  - No role hierarchy or inheritance system exists
+  - Role changes take effect immediately upon login
+  - No audit trail for role modifications
+  - Consider implementing:
+    - Role change logging
+    - Temporary role elevation
+    - Role expiration dates
+    - Multi-factor authentication for privileged roles
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/guides/authentication">
+    Learn about the authentication and session management system
+  </Card>
+  
+  <Card title="Navigation" icon="compass" href="/guides/navigation">
+    Explore module navigation and system workflows
+  </Card>
+</CardGroup>

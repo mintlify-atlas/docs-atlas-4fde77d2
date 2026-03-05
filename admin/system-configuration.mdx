@@ -1,0 +1,846 @@
+---
+title: 'System Configuration'
+description: 'PHP, web server, session management, and security configuration for Seguridad'
+icon: 'gear'
+---
+
+## Overview
+
+The Seguridad system requires specific PHP configuration, web server setup, and security settings to function properly. This guide covers all necessary configuration steps.
+
+## PHP Requirements
+
+### Version Requirements
+
+<CardGroup cols={2}>
+  <Card title="Minimum Version" icon="code">
+    PHP 7.0 or higher
+  </Card>
+  
+  <Card title="Recommended Version" icon="star">
+    PHP 7.4 or PHP 8.0+
+  </Card>
+</CardGroup>
+
+### Required PHP Extensions
+
+<Tabs>
+  <Tab title="Core Extensions">
+    <ResponseField name="pgsql" type="required">
+      PostgreSQL database connectivity
+      
+      ```bash
+      # Install on Ubuntu/Debian
+      sudo apt install php-pgsql
+      
+      # Install on CentOS/RHEL
+      sudo yum install php-pgsql
+      ```
+    </ResponseField>
+    
+    <ResponseField name="pdo_pgsql" type="recommended">
+      PDO PostgreSQL driver (for future improvements)
+      
+      ```bash
+      sudo apt install php-pdo-pgsql
+      ```
+    </ResponseField>
+    
+    <ResponseField name="mbstring" type="required">
+      Multibyte string handling (for character encoding)
+      
+      ```bash
+      sudo apt install php-mbstring
+      ```
+    </ResponseField>
+    
+    <ResponseField name="session" type="required">
+      Session management (typically built-in)
+      
+      Verify: `php -m | grep session`
+    </ResponseField>
+  </Tab>
+  
+  <Tab title="Additional Extensions">
+    <ResponseField name="gd" type="recommended">
+      Image processing for charts and graphics
+      
+      ```bash
+      sudo apt install php-gd
+      ```
+    </ResponseField>
+    
+    <ResponseField name="json" type="recommended">
+      JSON encoding/decoding
+      
+      Usually built-in on PHP 7.0+
+    </ResponseField>
+    
+    <ResponseField name="curl" type="optional">
+      HTTP requests (for external integrations)
+      
+      ```bash
+      sudo apt install php-curl
+      ```
+    </ResponseField>
+    
+    <ResponseField name="zip" type="optional">
+      Archive creation for exports
+      
+      ```bash
+      sudo apt install php-zip
+      ```
+    </ResponseField>
+  </Tab>
+</Tabs>
+
+### Verify Extensions
+
+```php verify_extensions.php
+<?php
+$required = ['pgsql', 'session', 'mbstring'];
+$recommended = ['pdo_pgsql', 'gd', 'json'];
+
+echo "<h2>Required Extensions</h2>";
+foreach ($required as $ext) {
+    $status = extension_loaded($ext) ? '✓' : '✗';
+    echo "$status $ext<br>";
+}
+
+echo "<h2>Recommended Extensions</h2>";
+foreach ($recommended as $ext) {
+    $status = extension_loaded($ext) ? '✓' : '✗';
+    echo "$status $ext<br>";
+}
+?>
+```
+
+## PHP Configuration (php.ini)
+
+### Critical Settings
+
+<CodeGroup>
+```ini php.ini - Production Settings
+; Error handling
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+display_errors = Off
+display_startup_errors = Off
+log_errors = On
+error_log = /var/log/php/error.log
+
+; Session configuration
+session.save_handler = files
+session.save_path = "/var/lib/php/sessions"
+session.use_cookies = 1
+session.use_only_cookies = 1
+session.cookie_httponly = 1
+session.cookie_secure = 0  ; Set to 1 if using HTTPS
+session.cookie_samesite = "Lax"
+session.gc_maxlifetime = 3600  ; 1 hour
+session.gc_probability = 1
+session.gc_divisor = 100
+
+; File uploads
+upload_max_filesize = 20M
+post_max_size = 25M
+file_uploads = On
+
+; Memory and execution
+memory_limit = 256M
+max_execution_time = 300
+max_input_time = 300
+
+; PostgreSQL
+pgsql.allow_persistent = On
+pgsql.auto_reset_persistent = Off
+pgsql.max_persistent = -1
+pgsql.max_links = -1
+
+; Character encoding
+default_charset = "UTF-8"
+mbstring.language = Spanish
+mbstring.internal_encoding = UTF-8
+
+; Date and timezone
+date.timezone = America/Argentina/Buenos_Aires
+```
+
+```ini php.ini - Development Settings
+; Error handling (verbose for debugging)
+error_reporting = E_ALL
+display_errors = On
+display_startup_errors = On
+log_errors = On
+
+; Disable opcache for development
+opcache.enable = 0
+
+; Other settings same as production
+```
+</CodeGroup>
+
+<Warning>
+  **Never use development settings in production!** Always disable `display_errors` and enable proper logging.
+</Warning>
+
+### Apply Configuration Changes
+
+<Steps>
+  <Step title="Edit php.ini">
+    Locate your php.ini file:
+    ```bash
+    php --ini | grep "Loaded Configuration File"
+    ```
+    
+    Common locations:
+    - Ubuntu/Debian: `/etc/php/7.4/apache2/php.ini`
+    - CentOS/RHEL: `/etc/php.ini`
+    - Windows: `C:\php\php.ini`
+  </Step>
+  
+  <Step title="Make Changes">
+    Edit the file with your preferred editor:
+    ```bash
+    sudo nano /etc/php/7.4/apache2/php.ini
+    ```
+  </Step>
+  
+  <Step title="Restart Web Server">
+    ```bash
+    # Apache
+    sudo systemctl restart apache2
+    
+    # Nginx + PHP-FPM
+    sudo systemctl restart php7.4-fpm
+    
+    # Windows IIS
+    iisreset
+    ```
+  </Step>
+  
+  <Step title="Verify Changes">
+    Create `phpinfo.php`:
+    ```php
+    <?php phpinfo(); ?>
+    ```
+    Access via browser and search for your settings
+  </Step>
+</Steps>
+
+## Web Server Configuration
+
+<Tabs>
+  <Tab title="Apache">
+    ### Apache 2.4 Configuration
+    
+    <CodeGroup>
+    ```apache /etc/apache2/sites-available/seguridad.conf
+    <VirtualHost *:80>
+        ServerName seguridad.local
+        DocumentRoot /var/www/seguridad
+        
+        <Directory /var/www/seguridad>
+            Options -Indexes +FollowSymLinks
+            AllowOverride All
+            Require all granted
+            
+            # PHP settings
+            php_value upload_max_filesize 20M
+            php_value post_max_size 25M
+            php_value max_execution_time 300
+            php_flag display_errors Off
+        </Directory>
+        
+        # Logs
+        ErrorLog ${APACHE_LOG_DIR}/seguridad_error.log
+        CustomLog ${APACHE_LOG_DIR}/seguridad_access.log combined
+        
+        # Security headers
+        Header always set X-Frame-Options "SAMEORIGIN"
+        Header always set X-Content-Type-Options "nosniff"
+        Header always set X-XSS-Protection "1; mode=block"
+    </VirtualHost>
+    ```
+    
+    ```apache .htaccess (in document root)
+    # Rewrite engine
+    RewriteEngine On
+    
+    # Prevent directory listing
+    Options -Indexes
+    
+    # Protect sensitive files
+    <FilesMatch "\.(ini|conf|sql|log)$">
+        Require all denied
+    </FilesMatch>
+    
+    # PHP security
+    php_flag display_errors Off
+    php_flag log_errors On
+    php_value error_log /var/log/seguridad/php_errors.log
+    
+    # Session settings
+    php_value session.gc_maxlifetime 3600
+    php_flag session.cookie_httponly On
+    ```
+    </CodeGroup>
+    
+    ### Enable Site
+    
+    ```bash
+    # Enable required modules
+    sudo a2enmod rewrite
+    sudo a2enmod headers
+    
+    # Enable site
+    sudo a2ensite seguridad.conf
+    
+    # Test configuration
+    sudo apache2ctl configtest
+    
+    # Restart Apache
+    sudo systemctl restart apache2
+    ```
+  </Tab>
+  
+  <Tab title="Nginx">
+    ### Nginx Configuration
+    
+    ```nginx /etc/nginx/sites-available/seguridad
+    server {
+        listen 80;
+        server_name seguridad.local;
+        root /var/www/seguridad;
+        index index.php index.html;
+        
+        # Logging
+        access_log /var/log/nginx/seguridad_access.log;
+        error_log /var/log/nginx/seguridad_error.log;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        
+        # Prevent access to sensitive files
+        location ~ \.(ini|conf|sql|log)$ {
+            deny all;
+        }
+        
+        # PHP processing
+        location ~ \.php$ {
+            fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi_params;
+            
+            # PHP settings
+            fastcgi_param PHP_VALUE "
+                upload_max_filesize=20M
+                post_max_size=25M
+                max_execution_time=300
+                display_errors=Off
+            ";
+        }
+        
+        # Static files
+        location ~* \.(jpg|jpeg|png|gif|ico|css|js)$ {
+            expires 7d;
+            add_header Cache-Control "public";
+        }
+        
+        # Deny access to hidden files
+        location ~ /\. {
+            deny all;
+        }
+    }
+    ```
+    
+    ### Enable Configuration
+    
+    ```bash
+    # Create symbolic link
+    sudo ln -s /etc/nginx/sites-available/seguridad \
+               /etc/nginx/sites-enabled/
+    
+    # Test configuration
+    sudo nginx -t
+    
+    # Restart Nginx
+    sudo systemctl restart nginx
+    sudo systemctl restart php7.4-fpm
+    ```
+  </Tab>
+</Tabs>
+
+## Session Management
+
+### Session Configuration
+
+The system uses PHP sessions extensively for authentication and state management:
+
+<CodeGroup>
+```php Session Initialization
+<?php
+@session_start();
+
+// Set session variables on login
+$_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s");
+$_SESSION["autentificado"] = "SI";
+$_SESSION["_usr"] = $username;
+$_SESSION["_pass"] = $password;  // Store hashed instead!
+$_SESSION["_categoria"] = $permission_code;
+?>
+```
+
+```php Session Validation
+<?php
+@session_start();
+
+if (!isset($_SESSION["_usr"])) {
+    echo "Tu no estas autentificado";
+    exit();
+}
+
+// Update last access time
+$_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s");
+?>
+```
+
+```php Session Timeout (Recommended)
+<?php
+@session_start();
+
+if (isset($_SESSION["ultimoAcceso"])) {
+    $fechaGuardada = $_SESSION["ultimoAcceso"];
+    $ahora = date("Y-n-j H:i:s");
+    $tiempo_transcurrido = strtotime($ahora) - strtotime($fechaGuardada);
+    
+    // 600 seconds = 10 minutes
+    if ($tiempo_transcurrido >= 600) {
+        session_destroy();
+        header("Location: inactivo.php");
+        exit();
+    }
+}
+
+$_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s");
+?>
+```
+
+```php Logout
+<?php
+session_start();
+$_SESSION = array();  // Clear all session data
+session_destroy();    // Destroy session
+header("Location: index.php");
+exit();
+?>
+```
+</CodeGroup>
+
+### Session Security Improvements
+
+<AccordionGroup>
+  <Accordion title="1. Regenerate Session ID on Login">
+    Prevents session fixation attacks:
+    
+    ```php
+    // After successful authentication
+    session_regenerate_id(true);
+    $_SESSION["_usr"] = $username;
+    $_SESSION["_categoria"] = $permission;
+    ```
+  </Accordion>
+  
+  <Accordion title="2. Secure Session Cookie Settings">
+    ```php
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 1);     // HTTPS only
+    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.use_strict_mode', 1);
+    
+    session_start();
+    ```
+  </Accordion>
+  
+  <Accordion title="3. Don't Store Passwords in Sessions">
+    ```php
+    // Current (INSECURE)
+    $_SESSION["_pass"] = $password;
+    
+    // Improved (don't store password)
+    $_SESSION["_usr"] = $username;
+    $_SESSION["_authenticated"] = true;
+    $_SESSION["_login_time"] = time();
+    ```
+  </Accordion>
+  
+  <Accordion title="4. Implement CSRF Protection">
+    ```php
+    // Generate token
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    
+    // Include in forms
+    echo '<input type="hidden" name="csrf_token" 
+          value="' . $_SESSION['csrf_token'] . '">';
+    
+    // Validate on submission
+    if ($_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die('CSRF token validation failed');
+    }
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Security Configuration
+
+### Error Suppression Issues
+
+<Warning>
+  The codebase uses `@` error suppression extensively:
+  
+  ```php
+  @session_start();
+  @$res = pg_query($sql);
+  @$row = pg_fetch_row($res);
+  ```
+  
+  This **hides critical errors** and makes debugging difficult.
+</Warning>
+
+**Recommendation**: Remove `@` operators and implement proper error handling:
+
+```php
+// Instead of:
+@$result = pg_query($sql);
+
+// Use:
+$result = pg_query($sql);
+if (!$result) {
+    error_log("Database error: " . pg_last_error());
+    die("An error occurred. Please contact support.");
+}
+```
+
+### SQL Injection Prevention
+
+<Tabs>
+  <Tab title="Current (Vulnerable)">
+    ```php
+    // VULNERABLE to SQL injection
+    $sql = "SELECT * FROM usuario 
+            WHERE usd='$user' AND pwd='$pass'";
+    $res = pg_exec($sql);
+    ```
+  </Tab>
+  
+  <Tab title="Improved (Parameterized)">
+    ```php
+    // Use pg_query_params
+    $sql = "SELECT * FROM usuario 
+            WHERE usd=$1 AND pwd=$2";
+    $result = pg_query_params($conn, $sql, 
+                              array($user, $hashed_pass));
+    ```
+  </Tab>
+  
+  <Tab title="Best (PDO)">
+    ```php
+    // Use PDO with prepared statements
+    $pdo = new PDO(
+        "pgsql:host=$host;port=$port;dbname=$dbname",
+        $user, $password
+    );
+    
+    $stmt = $pdo->prepare(
+        "SELECT * FROM usuario WHERE usd=? AND pwd=?"
+    );
+    $stmt->execute([$username, $hashed_password]);
+    $user = $stmt->fetch();
+    ```
+  </Tab>
+</Tabs>
+
+### File Permissions
+
+<Steps>
+  <Step title="Set Ownership">
+    ```bash
+    # Set web server as owner
+    sudo chown -R www-data:www-data /var/www/seguridad
+    ```
+  </Step>
+  
+  <Step title="Set Directory Permissions">
+    ```bash
+    # Directories: 755 (rwxr-xr-x)
+    find /var/www/seguridad -type d -exec chmod 755 {} \;
+    ```
+  </Step>
+  
+  <Step title="Set File Permissions">
+    ```bash
+    # PHP files: 644 (rw-r--r--)
+    find /var/www/seguridad -type f -name "*.php" \
+        -exec chmod 644 {} \;
+    ```
+  </Step>
+  
+  <Step title="Protect Configuration Files">
+    ```bash
+    # Config files: 600 (rw-------)
+    chmod 600 /var/www/seguridad/miconexion.php
+    chmod 600 /var/www/seguridad/*/miconexion.php
+    ```
+  </Step>
+  
+  <Step title="Writable Directories">
+    ```bash
+    # Upload directories: 775 (rwxrwxr-x)
+    mkdir -p /var/www/seguridad/uploads
+    chmod 775 /var/www/seguridad/uploads
+    chown www-data:www-data /var/www/seguridad/uploads
+    ```
+  </Step>
+</Steps>
+
+## Logging Configuration
+
+### PHP Error Logging
+
+```bash
+# Create log directory
+sudo mkdir -p /var/log/seguridad
+sudo chown www-data:www-data /var/log/seguridad
+sudo chmod 755 /var/log/seguridad
+```
+
+<CodeGroup>
+```php Custom Error Handler
+<?php
+// Set custom error log
+ini_set('error_log', '/var/log/seguridad/php_errors.log');
+
+// Custom error handler
+function customErrorHandler($errno, $errstr, $errfile, $errline) {
+    $message = date('[Y-m-d H:i:s] ') . 
+               "Error [$errno]: $errstr in $errfile on line $errline\n";
+    error_log($message, 3, '/var/log/seguridad/app_errors.log');
+    
+    // Display user-friendly message
+    if (ini_get('display_errors') == '0') {
+        echo "An error occurred. Please contact support.";
+    }
+}
+
+set_error_handler('customErrorHandler');
+?>
+```
+
+```php Database Query Logging
+<?php
+function logQuery($sql, $success = true) {
+    $status = $success ? 'SUCCESS' : 'FAILED';
+    $message = date('[Y-m-d H:i:s] ') . 
+               "[$status] User: {$_SESSION['_usr']} | " .
+               "Query: $sql\n";
+    error_log($message, 3, '/var/log/seguridad/queries.log');
+}
+
+// Usage
+$result = pg_query($conn, $sql);
+logQuery($sql, $result !== false);
+?>
+```
+</CodeGroup>
+
+### Log Rotation
+
+```bash /etc/logrotate.d/seguridad
+/var/log/seguridad/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0644 www-data www-data
+    sharedscripts
+    postrotate
+        systemctl reload apache2 > /dev/null 2>&1 || true
+    endscript
+}
+```
+
+## Performance Optimization
+
+<AccordionGroup>
+  <Accordion title="OPcache Configuration">
+    ```ini php.ini
+    [opcache]
+    opcache.enable=1
+    opcache.memory_consumption=256
+    opcache.interned_strings_buffer=16
+    opcache.max_accelerated_files=10000
+    opcache.revalidate_freq=2
+    opcache.fast_shutdown=1
+    ```
+  </Accordion>
+  
+  <Accordion title="Persistent Database Connections">
+    ```php
+    // Use persistent connections
+    $conn = pg_pconnect(
+        "host=$host port=$port dbname=$dbname " .
+        "user=$user password=$pass"
+    );
+    ```
+    
+    <Note>
+      Monitor connection pool to avoid exhaustion
+    </Note>
+  </Accordion>
+  
+  <Accordion title="Output Buffering">
+    ```ini php.ini
+    output_buffering = 4096
+    ```
+    
+    ```php In code
+    <?php
+    ob_start();
+    // ... page content ...
+    ob_end_flush();
+    ?>
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Environment-Specific Configuration
+
+<Tabs>
+  <Tab title="Development">
+    ```php config_dev.php
+    <?php
+    // Development environment
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    ini_set('log_errors', 1);
+    
+    // Database
+    define('DB_HOST', 'localhost');
+    define('DB_PORT', '5434');
+    define('DB_NAME', 'seguridad_dev');
+    define('DB_USER', 'postgres');
+    define('DB_PASS', 'dev_password');
+    
+    // Session (short timeout for testing)
+    ini_set('session.gc_maxlifetime', 600);
+    ?>
+    ```
+  </Tab>
+  
+  <Tab title="Production">
+    ```php config_prod.php
+    <?php
+    // Production environment
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    ini_set('display_errors', 0);
+    ini_set('log_errors', 1);
+    ini_set('error_log', '/var/log/seguridad/php_errors.log');
+    
+    // Database
+    define('DB_HOST', 'localhost');
+    define('DB_PORT', '5434');
+    define('DB_NAME', 'seguridad_db');
+    define('DB_USER', 'seguridad_app');
+    define('DB_PASS', getenv('DB_PASSWORD'));  // From environment
+    
+    // Session (1 hour timeout)
+    ini_set('session.gc_maxlifetime', 3600);
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.cookie_secure', 1);
+    ?>
+    ```
+  </Tab>
+</Tabs>
+
+## Health Check
+
+Create a system health check script:
+
+```php health_check.php
+<?php
+header('Content-Type: application/json');
+
+$health = [
+    'status' => 'ok',
+    'checks' => []
+];
+
+// Check PHP version
+$health['checks']['php_version'] = [
+    'status' => version_compare(PHP_VERSION, '7.0', '>=') ? 'ok' : 'fail',
+    'version' => PHP_VERSION
+];
+
+// Check extensions
+$required_extensions = ['pgsql', 'session', 'mbstring'];
+foreach ($required_extensions as $ext) {
+    $health['checks']['extension_' . $ext] = [
+        'status' => extension_loaded($ext) ? 'ok' : 'fail'
+    ];
+}
+
+// Check database connection
+try {
+    $conn = pg_connect("host=localhost port=5434 dbname=seguridad_db user=postgres");
+    $health['checks']['database'] = [
+        'status' => $conn ? 'ok' : 'fail'
+    ];
+    if ($conn) pg_close($conn);
+} catch (Exception $e) {
+    $health['checks']['database'] = ['status' => 'fail', 'error' => $e->getMessage()];
+}
+
+// Check session directory
+$session_path = session_save_path();
+$health['checks']['session_directory'] = [
+    'status' => is_writable($session_path) ? 'ok' : 'fail',
+    'path' => $session_path
+];
+
+// Overall status
+foreach ($health['checks'] as $check) {
+    if ($check['status'] === 'fail') {
+        $health['status'] = 'fail';
+        break;
+    }
+}
+
+echo json_encode($health, JSON_PRETTY_PRINT);
+?>
+```
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Database Setup" icon="database" href="/admin/database-setup">
+    PostgreSQL configuration
+  </Card>
+  
+  <Card title="User Management" icon="users" href="/admin/user-management">
+    Session-based authentication
+  </Card>
+  
+  <Card title="Permissions" icon="shield-check" href="/admin/permissions">
+    Access control system
+  </Card>
+  
+  <Card title="Regional Units" icon="building" href="/admin/regional-units">
+    Multi-unit architecture
+  </Card>
+</CardGroup>

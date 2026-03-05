@@ -1,0 +1,490 @@
+---
+title: 'Integrated Operations'
+description: 'Manage multi-unit coordinated police operations with comprehensive tracking of resources and outcomes'
+icon: 'users-gear'
+---
+
+## Overview
+
+Integrated Operations (Operativos Integrales) are large-scale, coordinated police operations that involve multiple units, sectors, or departments working together. This module provides specialized tracking for complex operations with detailed personnel assignments, comprehensive seizure records, and extensive detention statistics.
+
+<Info>
+Integrated operations differ from standard operations by providing more detailed tracking of personnel, resources, demographics, and outcomes across multiple sectors.
+</Info>
+
+## Key Features
+
+<CardGroup cols={2}>
+  <Card title="Multi-Sector Coordination" icon="diagram-project">
+    Track operations involving multiple sectors from UR-I, UR-X, and Vehicle Control units
+  </Card>
+  
+  <Card title="Detailed Demographics" icon="users">
+    Record comprehensive demographic data on detained persons (age, gender, legal status)
+  </Card>
+  
+  <Card title="Resource Tracking" icon="box-archive">
+    Document all vehicles, weapons, drugs, and other items seized during operations
+  </Card>
+  
+  <Card title="Personnel Management" icon="id-badge">
+    Track sector chiefs, support chiefs, and all personnel involved in operations
+  </Card>
+</CardGroup>
+
+## Accessing Integrated Operations
+
+Navigate to the integrated operations registration:
+
+- **Path:** `registrar_operativo_integral.php`
+- **Form:** Loaded from `form/form_operativo_integral.php`
+- **Required Role:** Operations coordinator or authorized supervisor
+
+## Registration Form
+
+### Operation Header Information
+
+<AccordionGroup>
+  <Accordion title="Date & Time" icon="calendar-clock">
+    <ParamField path="fecha_operativo" type="date" required>
+      **FECHA OPERATIVO (Operation Date)**
+      
+      Date when the operation was conducted (format: DD-MM-YYYY)
+    </ParamField>
+    
+    <ParamField path="hora_operativo" type="time" required>
+      **HORA (Time)**
+      
+      Time when operation commenced (format: HH:MM)
+    </ParamField>
+  </Accordion>
+
+  <Accordion title="Sector Assignment" icon="location-dot">
+    <ParamField path="sector" type="select" required>
+      **SECTOR**
+      
+      Select the sector where operation was conducted:
+      
+      - **UR-I Sectors:** 01-22 (Regional Unit I)
+      - **UR-X Sectors:** 01-15 (Regional Unit X)
+      - **CV Sectors:** 01-05 (Control Vehicular / Vehicle Control)
+    </ParamField>
+  </Accordion>
+
+  <Accordion title="Personnel Leadership" icon="user-tie">
+    <ParamField path="jefe_sector" type="string" required>
+      **JEFE DE SECTOR (Sector Chief)**
+      
+      Name and rank of the sector chief leading the operation
+    </ParamField>
+    
+    <ParamField path="personal_actuante" type="string" required>
+      **JER. NOM. Y AP. PERSONAL ACTUANTE (Acting Personnel)**
+      
+      Hierarchy, names, and surnames of all personnel involved in the operation
+    </ParamField>
+  </Accordion>
+
+  <Accordion title="Location Details" icon="map-pin">
+    <ParamField path="chacra_barrio" type="string" required>
+      **CHACRA O BARRIO (District or Neighborhood)**
+      
+      Name of the district, neighborhood, or rural area
+    </ParamField>
+    
+    <ParamField path="lugar_operativo" type="string" required>
+      **LUGAR (Location)**
+      
+      Specific location or address where operation took place
+    </ParamField>
+  </Accordion>
+</AccordionGroup>
+
+## Seizures & Confiscations
+
+### Vehicle Seizures
+
+Record detailed information about vehicles seized during the operation:
+
+<Tabs>
+  <Tab title="Quantity">
+    <ResponseField name="secuestro_autovehiculo" type="integer" required>
+      **SECUESTRO/S AUTOVEHICULOS** - Number of automobiles seized
+    </ResponseField>
+    
+    <ResponseField name="secuestro_motovehiculo" type="integer" required>
+      **SECUESTRO/S MOTOCICLETAS** - Number of motorcycles seized
+    </ResponseField>
+    
+    <ResponseField name="secuestro_otros" type="integer" required>
+      **SECUESTRO/S OTROS** - Number of other vehicles/items seized
+    </ResponseField>
+  </Tab>
+  
+  <Tab title="Details">
+    <ResponseField name="secuestro_marca" type="string">
+      **MARCA** - Vehicle brand/make
+    </ResponseField>
+    
+    <ResponseField name="secuestro_dominio" type="string">
+      **DOMINIO** - License plate number
+    </ResponseField>
+    
+    <ResponseField name="secuestro_chasis" type="string">
+      **NRO. CHASIS/CUADRO** - Chassis or frame number
+    </ResponseField>
+    
+    <ResponseField name="secuestro_motor" type="string">
+      **NRO. MOTOR** - Engine number
+    </ResponseField>
+  </Tab>
+</Tabs>
+
+<Note>
+For multiple seized vehicles, enter details of the primary or most significant vehicle. Additional vehicles can be documented in operation notes.
+</Note>
+
+### Vehicle Retentions
+
+Track temporary vehicle retentions (different from seizures):
+
+<CardGroup cols={3}>
+  <Card title="Automobiles" icon="car">
+    **RETENCION AUTOVEHICULO/S**
+    
+    Number of automobiles temporarily retained
+  </Card>
+  
+  <Card title="Motorcycles" icon="motorcycle">
+    **RETENCION MOTOCICLETA/S**
+    
+    Number of motorcycles temporarily retained
+  </Card>
+  
+  <Card title="Others" icon="truck">
+    **RETENCION OTRO/S**
+    
+    Number of other vehicles temporarily retained
+  </Card>
+</CardGroup>
+
+### Controlled Substances
+
+<Warning>
+Enter drug quantities as decimal numbers using a **period** (.) as the decimal separator, not a comma.
+</Warning>
+
+<ParamField path="secuestro_marihuana" type="decimal" required>
+  **SECUESTRO/S MARIHUANA (KG)**
+  
+  Quantity of marijuana seized in kilograms (decimal format: e.g., 2.5)
+</ParamField>
+
+<ParamField path="secuestro_otras_sustancias" type="decimal" required>
+  **SECUESTRO/S OTRAS SUSTANCIAS (KG)**
+  
+  Quantity of other controlled substances seized in kilograms
+</ParamField>
+
+### Weapons Seizures
+
+<ParamField path="secuestro_arma_blanca" type="integer" required>
+  **SECUESTRO/S ARMA BLANCA**
+  
+  Number of white weapons (knives, blades) seized
+</ParamField>
+
+<ParamField path="secuestro_arma_fuego" type="integer" required>
+  **SECUESTRO/S ARMA DE FUEGO**
+  
+  Number of firearms seized
+</ParamField>
+
+## Detention Statistics
+
+### Legal Classification
+
+Detained persons are classified by their legal status:
+
+<Steps>
+  <Step title="Prosecuted">
+    **DETENIDOS PROCESADOS** - Persons detained who are currently being prosecuted
+  </Step>
+  
+  <Step title="Contraventors">
+    **DETENIDOS CONTRAVENTORES** - Persons detained for contraventions (minor offenses)
+  </Step>
+  
+  <Step title="With Records">
+    **DETENIDOS ANTECEDENTES** - Persons detained with prior criminal records
+  </Step>
+  
+  <Step title="Family Disposition">
+    **DETENIDOS DISP. FAMILIAR** - Persons detained and released to family custody
+  </Step>
+</Steps>
+
+### Demographic Breakdown
+
+<Tabs>
+  <Tab title="By Gender">
+    <CardGroup cols={2}>
+      <Card title="Male" icon="mars">
+        **DETENIDO/S MASCULINOS**
+        
+        Number of male persons detained
+      </Card>
+      
+      <Card title="Female" icon="venus">
+        **DETENIDO/S FEMENINOS**
+        
+        Number of female persons detained
+      </Card>
+    </CardGroup>
+  </Tab>
+  
+  <Tab title="By Age">
+    <CardGroup cols={2}>
+      <Card title="Adults" icon="user">
+        **DETENIDO/S MAYORES DE 18 AÑOS**
+        
+        Number of detained persons over 18 years old
+      </Card>
+      
+      <Card title="Minors" icon="child">
+        **DETENIDO/S MENORES DE 18 AÑOS**
+        
+        Number of detained persons under 18 years old
+      </Card>
+    </CardGroup>
+  </Tab>
+</Tabs>
+
+### Personal Information
+
+<ParamField path="detenido_datos_filiatorios" type="string" required>
+  **DATOS FILIATORIOS (Personal Data)**
+  
+  Personal identification data of detained persons (names, ID numbers, addresses)
+</ParamField>
+
+<Tip>
+For multiple detained persons, enter primary subjects' information or use format: "Name1 (ID1), Name2 (ID2), etc."
+</Tip>
+
+## Traffic Enforcement Actions
+
+### Infraction Documentation
+
+<CardGroup cols={3}>
+  <Card title="Positive Tests" icon="vial">
+    **ALCOHOLEMIA/S POSITIVA/S**
+    
+    Number of positive breathalyzer tests
+  </Card>
+  
+  <Card title="License Retention" icon="id-card">
+    **LICENCIA/S RETENIDA/S**
+    
+    Number of driver's licenses retained
+  </Card>
+  
+  <Card title="Infraction Reports" icon="file-lines">
+    **ACTAS DE INFRACCION LABRADA/S**
+    
+    Number of infraction reports issued
+  </Card>
+</CardGroup>
+
+<Note>
+All numerical fields require **integer values** (whole numbers) unless specifically marked as decimal.
+</Note>
+
+## Saving Integrated Operations
+
+<Steps>
+  <Step title="Complete Required Fields">
+    Ensure all fields marked with * are completed
+  </Step>
+  
+  <Step title="Verify Data Accuracy">
+    Review all numerical values, dates, and personnel information
+  </Step>
+  
+  <Step title="Click Guardar">
+    Click the **Guardar (Save)** button to submit the operation
+  </Step>
+  
+  <Step title="Confirmation">
+    System will display confirmation message if successful
+  </Step>
+</Steps>
+
+The operation is saved to the database via `guardar_operativo_integral.php`.
+
+## Viewing & Modifying Operations
+
+### Operations List
+
+Integrated operations are displayed at the bottom of the registration form, showing:
+
+- Operation ID
+- Sector
+- Sector chief
+- Location details
+- All seizure and detention statistics
+- **Modificar** link to edit existing operations
+
+### Modification Process
+
+1. Click **Modificar** next to the operation you want to edit
+2. Form loads with existing data (`form_operativo_integral_modificar.php`)
+3. Update necessary fields
+4. Click **Guardar** to save changes
+
+## Database Structure
+
+### Integrated Operations Table (operativos_integrales)
+
+```sql
+operativos_integrales (
+  id_operativo_intregral,      -- Primary key
+  fecha_operativo,             -- Operation date
+  fecha_carga,                 -- Record creation timestamp
+  sector,                      -- Sector designation
+  jefe_sector,                 -- Sector chief name
+  chacra_barrio,               -- Neighborhood/district
+  lugar,                       -- Specific location
+  hora,                        -- Operation time
+  personal_actuante,           -- Acting personnel
+  
+  -- Vehicle seizures
+  secuestro_motovehiculo,
+  secuestro_autovehiculo,
+  secuestro_otros,
+  secuestro_marca,
+  secuestro_dominio,
+  secuestro_chasis,
+  secuestro_motor,
+  
+  -- Weapon seizures
+  secuestro_arma_blanca,
+  secuestro_arma_fuego,
+  
+  -- Drug seizures
+  secuestro_marihuana,
+  secuestro_otras_sustancias,
+  
+  -- Detentions
+  detenidos_procesados,
+  detenidos_contraventores,
+  detenidos_antecedentes,
+  detenidos_disposicion_familiar,
+  detenido_datos_filiatorios,
+  
+  -- Demographics
+  detenidos_masculinos,
+  detenidos_femeninos,
+  detenidos_mayor_18,
+  detenidos_menor_18,
+  
+  -- Vehicle retentions
+  actas_retencion_autovehiculo,
+  actas_retencion_motovehiculo,
+  actas_retencion_otros,
+  
+  -- Traffic enforcement
+  actas_licencias_retenidas,
+  actas_alcoholemia_positiva,
+  actas_infraccion_labradas
+)
+```
+
+## Sector Organization
+
+### UR-I Sectors (Regional Unit I)
+
+Sectors 01-22 covering the primary regional unit operations.
+
+### UR-X Sectors (Regional Unit X)
+
+Sectors 01-15 covering Regional Unit X operations.
+
+### Control Vehicular (Vehicle Control)
+
+Sectors 01-05 dedicated to vehicle control and traffic enforcement operations.
+
+<Info>
+Each sector typically covers a specific geographic area or operational zone within the regional unit's jurisdiction.
+</Info>
+
+## Statistical Analysis
+
+Integrated operations data feeds into statistical reports:
+
+- Aggregate statistics by sector type (UR-I, UR-X, CV)
+- Total seizures across all operations
+- Detention demographics and trends
+- Traffic enforcement metrics
+
+View comprehensive statistics via `detalle_operativo_integral.php`.
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Data Accuracy" icon="check-double">
+    - Verify all counts before entering (detentions, seizures, etc.)
+    - Use exact vehicle identification numbers when available
+    - Document all participating personnel completely
+    - Enter decimal drug quantities with proper precision
+  </Accordion>
+  
+  <Accordion title="Coordination" icon="handshake">
+    - Communicate with all participating sectors before registering
+    - Consolidate information from all units involved
+    - Designate one person to register the integrated operation
+    - Share final operation record with all participating units
+  </Accordion>
+  
+  <Accordion title="Timeliness" icon="clock">
+    - Register operations within 24 hours of completion
+    - Update records promptly if additional information emerges
+    - Ensure all seizures are properly documented before entry
+    - Complete demographic data before subjects are released
+  </Accordion>
+  
+  <Accordion title="Documentation" icon="file-pen">
+    - Maintain supporting documentation for all seizures
+    - Photograph seized vehicles and items
+    - Complete detailed arrest reports for all detentions
+    - Keep chain of custody records for evidence
+  </Accordion>
+</AccordionGroup>
+
+## Common Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Multi-Sector Sweeps" icon="broom">
+    Large-scale operations covering multiple sectors simultaneously to target specific crime types or areas
+  </Card>
+  
+  <Card title="Checkpoint Operations" icon="checkpoint">
+    Vehicle control operations involving multiple units at strategic locations
+  </Card>
+  
+  <Card title="Narcotics Operations" icon="pills">
+    Coordinated drug interdiction operations involving multiple agencies or units
+  </Card>
+  
+  <Card title="Warrant Service" icon="gavel">
+    Coordinated operations to serve multiple arrest warrants across jurisdictions
+  </Card>
+</CardGroup>
+
+## Related Features
+
+- [Operations Tracking](/features/operations-tracking) - Standard operations registration
+- [Operational Reports](/features/operational-reports) - Statistical reporting and analysis
+- [Personnel Management](/features/personnel-management) - Officer assignments and tracking
+- [Evidence Management](/features/evidence-management) - Managing seized items and evidence
+- [Detention Records](/features/detention-records) - Detailed detention and booking procedures

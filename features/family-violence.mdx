@@ -1,0 +1,449 @@
+---
+title: Family Violence
+description: Domestic violence and gender-based violence case management system with victim protection measures
+---
+
+The Family Violence module (Violencia Familiar o de Género) provides comprehensive tools for documenting, tracking, and managing domestic violence cases with focus on victim protection and case follow-up.
+
+## Overview
+
+This critical module handles:
+
+- Domestic violence case registration
+- Victim and accused party documentation
+- Protective measure tracking
+- Detention status monitoring
+- Case narrative documentation
+- Inter-agency coordination support
+
+<Warning>
+**Sensitive Data**: This module handles highly sensitive information about violence victims. Strict confidentiality and access control measures must be maintained.
+</Warning>
+
+## Case Registration System
+
+### Jurisdictional Assignment
+
+Each case is assigned to specific law enforcement units:
+
+<Steps>
+  <Step title="Regional Unit Selection">
+    **UNIDAD REGIONAL**
+    
+    Select from available Regional Units (UR) using dynamic dropdown:
+    
+    ```php
+    SELECT id, nombre 
+    FROM ur 
+    ORDER BY id
+    ```
+    
+    Units range from UR-1 through UR-15 across the jurisdiction.
+  </Step>
+
+  <Step title="Dependency Assignment">
+    **DEPENDENCIA**
+    
+    Specific police station or unit handling the case:
+    - Auto-populated based on Regional Unit selection
+    - Ensures proper case routing
+    - Enables jurisdictional tracking
+  </Step>
+</Steps>
+
+### Report Date Information
+
+The system captures when the report was filed:
+
+```php
+// Date components
+"d"  => Day of report (current day auto-filled)
+"m"  => Month of report (current month auto-filled)
+"a"  => Year of report (current year auto-filled)
+```
+
+<Info>
+**Auto-Population**: The date fields automatically populate with the current date, which can be adjusted if needed for backdated reports.
+</Info>
+
+## Party Information
+
+### Complainant/Victim Details
+
+<Card title="DENUNCIANTE" icon="user">
+  **Complainant Information**
+  
+  - Full name of person filing report
+  - May be the victim or third party
+  - Text field with 60-character capacity
+  - Required for case processing
+</Card>
+
+### Accused Party Details
+
+<Card title="ACUSADO/A" icon="gavel">
+  **Accused Person Information**
+  
+  - Full name of alleged perpetrator
+  - Text field with 60-character capacity
+  - Critical for protective measures
+  - Used for restraining order processing
+</Card>
+
+<Note>
+Both fields use gender-neutral formatting (DENUNCIANTE, ACUSADO/A) to accommodate all case types.
+</Note>
+
+## Incident Documentation
+
+### Case Narrative
+
+The system provides structured fields for detailed incident documentation:
+
+<Tabs>
+  <Tab title="Incident Description">
+    **RELATO SINTETICO DEL HECHO DENUNCIADO**
+    
+    (Synthetic Account of Reported Incident)
+    
+    ```html
+    <textarea name="relato" 
+              cols="45" 
+              rows="5">
+    </textarea>
+    ```
+    
+    **Should Include:**
+    - Date and time of incident
+    - Location of violence
+    - Nature of violence (physical, verbal, psychological)
+    - Injuries sustained
+    - Witnesses present
+    - Prior incidents (if applicable)
+    - Immediate danger assessment
+  </Tab>
+
+  <Tab title="Protective Measures">
+    **MEDIDAS ADOPTADAS**
+    
+    (Measures Adopted)
+    
+    ```html
+    <textarea name="medidas" 
+              cols="45" 
+              rows="5">
+    </textarea>
+    ```
+    
+    **Document:**
+    - Emergency protective orders issued
+    - Restraining orders requested/granted
+    - No-contact orders
+    - Emergency housing arrangements
+    - Medical attention provided
+    - Social services contacted
+    - Referrals to support organizations
+    - Safety planning conducted
+    
+    <Warning>
+    Proper documentation of protective measures is critical for victim safety and legal proceedings.
+    </Warning>
+  </Tab>
+
+  <Tab title="Additional Information">
+    **OTROS DATOS DE INTERES**
+    
+    (Other Data of Interest)
+    
+    ```html
+    <textarea name="otros" 
+              cols="45" 
+              rows="5">
+    </textarea>
+    ```
+    
+    **May Include:**
+    - History of domestic violence
+    - Children in household
+    - Weapons in home
+    - Substance abuse factors
+    - Mental health concerns
+    - Economic dependency
+    - Immigration status issues
+    - Language barriers
+    - Cultural considerations
+  </Tab>
+</Tabs>
+
+## Detention Management
+
+### Arrest Status Tracking
+
+The system monitors whether the accused was detained:
+
+<AccordionGroup>
+  <Accordion title="Detention Status">
+    **DETENIDO** (Detained)
+    
+    <CardGroup cols={3}>
+      <Card title="SELECCIONAR" icon="question">
+        Default/Not yet determined
+      </Card>
+      
+      <Card title="SI" icon="handcuffs">
+        Accused was arrested
+      </Card>
+      
+      <Card title="NO" icon="user-slash">
+        No arrest made
+      </Card>
+    </CardGroup>
+  </Accordion>
+
+  <Accordion title="Detention Duration">
+    **TIEMPO DETENIDO** (Time Detained)
+    
+    ```html
+    <input name="tiempo" 
+           type="text" 
+           size="50">
+    ```
+    
+    **Document:**
+    - Hours/days detained
+    - Detention location
+    - Release conditions (if applicable)
+    - Bail/bond status
+    - Court date assignments
+    - Monitoring requirements (ankle monitor, check-ins, etc.)
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+Detention information is crucial for victim safety planning and case management. Update this field as case status changes.
+</Info>
+
+## Case Management Workflow
+
+### Initial Report Processing
+
+<Steps>
+  <Step title="Emergency Response">
+    - Assess immediate danger
+    - Provide emergency medical care if needed
+    - Separate parties if both present
+    - Ensure victim safety
+  </Step>
+
+  <Step title="Case Creation">
+    - Log into Family Violence module
+    - Select Regional Unit and Dependency
+    - Verify auto-populated date or adjust if needed
+  </Step>
+
+  <Step title="Party Information">
+    - Enter complainant/victim name
+    - Enter accused party name
+    - Verify spelling for legal documents
+  </Step>
+
+  <Step title="Incident Documentation">
+    - Document detailed incident narrative
+    - Record all protective measures taken
+    - Note any additional relevant information
+  </Step>
+
+  <Step title="Detention Status">
+    - Select if arrest was made
+    - Document detention duration and conditions
+  </Step>
+
+  <Step title="Save Case">
+    Click GUARDAR (Save) to register case in system
+  </Step>
+</Steps>
+
+### Case Updates and Follow-up
+
+Cases can be updated as situations evolve:
+
+```php
+// Case deletion capability for authorized users
+if (isset($_GET["sel"])) {
+    $cod = $_GET["sel"];
+    
+    $sql = "DELETE FROM violencia_familiar 
+            WHERE cod=$cod";
+    
+    // Confirmation messages:
+    // Success: 'SE BORRO EL REGISTRO CORRECTAMENTE'
+    // Error: 'ERROR, NO SE PUDO BORRAR EL REGISTRO'
+}
+```
+
+<Warning>
+**Deletion Restrictions**: Case deletion should be restricted to authorized administrators only. Consider implementing soft deletes to maintain case history.
+</Warning>
+
+## Data Structure
+
+The violencia_familiar table stores:
+
+<CodeGroup>
+```sql Table Schema
+CREATE TABLE violencia_familiar (
+    cod INTEGER PRIMARY KEY,        -- Case code
+    ur_id INTEGER,                  -- Regional unit
+    dependencia VARCHAR,            -- Police station
+    fecha_denuncia DATE,            -- Report date
+    denunciante VARCHAR(60),        -- Complainant name
+    acusado VARCHAR(60),            -- Accused name
+    relato TEXT,                    -- Incident narrative
+    medidas TEXT,                   -- Protective measures
+    otros TEXT,                     -- Additional info
+    detenido VARCHAR(20),           -- Detention status
+    tiempo_detenido VARCHAR(50)     -- Detention duration
+);
+```
+
+```sql Insert Example
+INSERT INTO violencia_familiar VALUES (
+    nextval('seq'),         -- Auto-generated code
+    $ur_id,                 -- Selected UR
+    '$dependencia',         -- Selected dependency
+    '$fecha',               -- Report date
+    '$denunciante',         -- Complainant
+    '$acusado',             -- Accused
+    '$relato',              -- Incident details
+    '$medidas',             -- Measures taken
+    '$otros',               -- Other information
+    '$detenido',            -- Yes/No/Unknown
+    '$tiempo'               -- Detention time
+);
+```
+</CodeGroup>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Victim Safety First">
+    **Priority Considerations:**
+    - Assess lethality risk immediately
+    - Implement protective measures before completing documentation
+    - Provide victim with safety plan and resources
+    - Coordinate with victim services organizations
+    - Follow up within 24-48 hours
+    
+    <Tip>
+    Keep emergency shelter and hotline information readily accessible for immediate referrals.
+    </Tip>
+  </Accordion>
+
+  <Accordion title="Thorough Documentation">
+    **Documentation Standards:**
+    - Use objective, factual language
+    - Include direct quotes when relevant
+    - Document all visible injuries with photos if possible
+    - Note demeanor and emotional state
+    - Record exact threats made
+    - List all witnesses
+    - Preserve evidence properly
+    
+    <Note>
+    Detailed documentation strengthens legal cases and improves victim outcomes.
+    </Note>
+  </Accordion>
+
+  <Accordion title="Protective Measures">
+    **Common Interventions:**
+    - Emergency Protective Orders (EPO)
+    - Temporary Restraining Orders (TRO)
+    - No-contact directives
+    - Weapon confiscation
+    - Emergency housing referrals
+    - Medical treatment coordination
+    - Crisis counseling referrals
+    - Child protective services notification (when applicable)
+  </Accordion>
+
+  <Accordion title="Follow-up Protocols">
+    **Case Management:**
+    - Schedule follow-up contact within 24-48 hours
+    - Verify protective orders were served
+    - Check on victim safety regularly
+    - Update case notes with new information
+    - Coordinate with prosecutors office
+    - Track court dates and outcomes
+    - Document any violations of protective orders
+  </Accordion>
+</AccordionGroup>
+
+## Integration with Other Systems
+
+Family Violence cases may connect with:
+
+<CardGroup cols={2}>
+  <Card title="Homicides" icon="skull">
+    Cases that escalate to domestic homicide or femicide
+    
+    [View Homicides Module →](/features/homicides)
+  </Card>
+
+  <Card title="Reports" icon="file-chart-column">
+    Statistical analysis of domestic violence patterns
+    
+    [View Reports →](/features/reports)
+  </Card>
+</CardGroup>
+
+## Reporting Capabilities
+
+The system enables analysis of:
+
+- **Case Volume**: Track cases by jurisdiction and time period
+- **Repeat Offenders**: Identify accused parties with multiple reports
+- **Detention Rates**: Monitor arrest rates in domestic violence cases
+- **Geographic Patterns**: Analyze hotspots for targeted intervention
+- **Protective Measure Effectiveness**: Evaluate which measures work best
+
+## Victim Resources
+
+<Note>
+**Resource Integration**: Consider integrating links to victim support services:
+- Domestic violence hotlines
+- Emergency shelters
+- Legal aid services
+- Counseling services
+- Children's services
+- Immigration assistance
+</Note>
+
+## Multi-Agency Coordination
+
+Family violence cases often require coordination with:
+
+1. **Judicial System**
+   - Courts for protective orders
+   - Prosecutors for criminal charges
+   - Probation for monitoring
+
+2. **Social Services**
+   - Child protective services
+   - Housing assistance
+   - Financial support programs
+
+3. **Healthcare**
+   - Emergency medical care
+   - Forensic documentation
+   - Mental health services
+
+4. **Community Organizations**
+   - Victim advocacy groups
+   - Domestic violence shelters
+   - Legal aid clinics
+
+## Related Modules
+
+- [Homicides](/features/homicides) - For cases escalating to femicide or domestic homicide
+- [Statistics Dashboard](/features/statistics) - Analyze domestic violence trends
+- [Case Management](/features/case-management) - General case tracking and follow-up

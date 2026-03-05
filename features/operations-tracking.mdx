@@ -1,0 +1,330 @@
+---
+title: 'Operations Tracking'
+description: 'Learn how to register and track police operations in the Seguridad system'
+icon: 'police'
+---
+
+## Overview
+
+The Operations Tracking module allows you to register, monitor, and manage police operations (operativos) conducted across different jurisdictions and police stations. This system tracks operational details including personnel, resources, detentions, seizures, and outcomes.
+
+## Accessing Operations Registration
+
+Navigate to the operations registration form to record new police operations:
+
+- **Path:** `registrar_operativo.php`
+- **Required Role:** Operations personnel with appropriate jurisdiction access
+
+<Info>
+Operations are registered with unique DOP (Division of Operations) order numbers and tracked by year and jurisdiction.
+</Info>
+
+## Operation Registration Form
+
+### Basic Operation Information
+
+The following fields are required to register a new operation:
+
+<AccordionGroup>
+  <Accordion title="Operation Identifiers" icon="fingerprint">
+    - **NRO. ORDEN DOP:** Operation order number assigned by the Division of Operations
+    - **Year:** Year of the operation (defaults to current year)
+    - **EXPEDIENTE DOP:** File number associated with the operation
+    - **ORDEN INTERNA:** Internal order number (optional)
+  </Accordion>
+
+  <Accordion title="Jurisdiction & Location" icon="map-location-dot">
+    - **JURISDICCION (Jurisdiction):** Select from available regional units (Unidad Regional I-XII)
+    - **COMISARIA (Police Station):** Select police station within chosen jurisdiction
+    - **BARRIO/CHACRA:** Neighborhood or district name
+    - **Location Coordinates:** Latitude and longitude (selected via interactive map)
+  </Accordion>
+
+  <Accordion title="Date & Time" icon="clock">
+    - **FECHA INICIO:** Start date of operation
+    - **HORA INICIO:** Start time of operation
+    - **FECHA FIN:** End date of operation
+    - **HORA FIN:** End time of operation
+  </Accordion>
+</AccordionGroup>
+
+### Operation Details
+
+#### Event Description
+
+<ParamField path="evento" type="string" required>
+  Brief description of the operation event or purpose
+</ParamField>
+
+#### Personnel & Identifications
+
+<ParamField path="personas_identificadas" type="number" default="0">
+  Number of persons identified during the operation
+</ParamField>
+
+### Detention Statistics
+
+Track different categories of detentions made during the operation:
+
+<CardGroup cols={3}>
+  <Card title="Contraventores" icon="user-lock">
+    **DETENIDOS CONTRAVENTORES**
+    
+    Persons detained for contraventions (minor offenses)
+  </Card>
+  
+  <Card title="With Records" icon="file-shield">
+    **DETENIDOS ANTECEDENTES**
+    
+    Persons detained with prior criminal records
+  </Card>
+  
+  <Card title="Prosecuted" icon="gavel">
+    **DETENIDOS PROCESADOS**
+    
+    Persons detained who are being prosecuted
+  </Card>
+</CardGroup>
+
+### Seizures & Confiscations
+
+Record items seized during the operation:
+
+#### Vehicles
+
+<ResponseField name="secuestro_motovehiculo" type="number">
+  Number of motorcycles seized
+</ResponseField>
+
+<ResponseField name="secuestro_autovehiculo" type="number">
+  Number of automobiles seized
+</ResponseField>
+
+<ResponseField name="secuestro_otros" type="number">
+  Number of other vehicles or items seized
+</ResponseField>
+
+#### Traffic Infractions
+
+<CardGroup cols={3}>
+  <Card title="Infraction Reports" icon="file-invoice">
+    **ACTAS DE INFRACCION**
+    
+    Number of infraction reports issued
+  </Card>
+  
+  <Card title="Licenses Retained" icon="id-card">
+    **LICENCIAS RETENIDAS**
+    
+    Number of driver's licenses retained
+  </Card>
+  
+  <Card title="Positive Breathalyzer" icon="wine-bottle">
+    **ALCOHOLEMIA POSITIVA**
+    
+    Number of positive alcohol tests
+  </Card>
+</CardGroup>
+
+### Location Selection
+
+<Steps>
+  <Step title="Open Interactive Map">
+    The registration form includes an interactive map powered by Leaflet/OpenStreetMap
+  </Step>
+  
+  <Step title="Click Operation Location">
+    Click on the map where the operation took place
+  </Step>
+  
+  <Step title="Coordinates Auto-Fill">
+    Latitude and longitude fields will automatically populate with the selected coordinates
+  </Step>
+  
+  <Step title="Verify Location">
+    Ensure the selected location matches the operation's actual location
+  </Step>
+</Steps>
+
+<Warning>
+Location coordinates are **required** for all operations. Always select the precise location on the map before saving.
+</Warning>
+
+### Additional Information
+
+<ParamField path="observaciones" type="textarea">
+  **OBSERVACIONES (Observations)**
+  
+  Additional notes, comments, or details about the operation that don't fit in other fields
+</ParamField>
+
+## Saving an Operation
+
+Once all required fields are completed:
+
+1. Review all entered information for accuracy
+2. Click the **Guardar (Save)** button
+3. System will validate required fields
+4. Operation will be saved to the database
+5. You'll receive confirmation of successful registration
+
+<Tip>
+Use the **Cancelar (Cancel)** button to return to the operations list without saving changes.
+</Tip>
+
+## Viewing Operations List
+
+Access the complete list of registered operations:
+
+- **Path:** `listado_operativos.php`
+- **Features:** Filtering, searching, and bulk viewing capabilities
+
+### List View Columns
+
+The operations list displays:
+
+| Column | Description |
+|--------|-------------|
+| NRO | Sequential number |
+| NRO. ORDEN DOP | DOP order number |
+| ANIO | Year |
+| FECHA INICIO | Start date |
+| HORA INICIO | Start time |
+| EXPEDIENTE | File number |
+| JURISDICCION | Regional unit |
+| COMISARIA | Police station |
+| EVENTO | Event description |
+| PERS. IDENTIF. | Persons identified |
+| DET. CONTRAVENTORES | Detained contraventors |
+| DET. ANTECEDENTES | Detained with records |
+| DET. PROCESADOS | Prosecuted detained |
+| SEC. MOTOVEH. | Motorcycles seized |
+| SEC. AUTOVEH. | Automobiles seized |
+| SEC. OTROS | Other seizures |
+| ACTAS INFRACCION | Infraction reports |
+| BARRIO | Neighborhood |
+| FECHA FIN | End date |
+| HORA FIN | End time |
+| LIC. RETENIDAS | Licenses retained |
+| ALCOHOLEMIA | Positive breathalyzers |
+| ACCIONES | Modify action |
+| BORRAR | Delete action |
+
+## Querying Operations
+
+Use the operations query interface (`consultaOperativos.php`) to filter and search:
+
+<CardGroup cols={2}>
+  <Card title="By Jurisdiction" icon="building">
+    Filter operations by regional unit (UNIDAD)
+  </Card>
+  
+  <Card title="By Police Station" icon="building-shield">
+    Filter by specific police station (COMISARIAS)
+  </Card>
+  
+  <Card title="By Date Range" icon="calendar-range">
+    Search operations between specific dates (DESDE/HASTA)
+  </Card>
+  
+  <Card title="View All" icon="list">
+    Select "TODOS" to view all operations in a jurisdiction
+  </Card>
+</CardGroup>
+
+<Note>
+When filtering by "TODOS" (all) for both unit and station, limit the date range to a maximum of 1 year to ensure optimal performance.
+</Note>
+
+## Modifying Operations
+
+To update an existing operation:
+
+1. Navigate to the operations list
+2. Click **MODIFICAR** next to the operation you want to edit
+3. The registration form will load with existing data
+4. Update the necessary fields
+5. Click **Guardar** to save changes
+
+## Deleting Operations
+
+<Warning>
+Deleting an operation is permanent and cannot be undone.
+</Warning>
+
+To delete an operation:
+
+1. Navigate to the operations list
+2. Click **BORRAR** next to the operation
+3. Confirm the deletion when prompted
+4. Operation will be removed from the database
+
+## Database Structure
+
+### Operations Table (operativos)
+
+Key fields stored in the database:
+
+```sql
+operativos (
+  nro_operativo,          -- Operation number
+  ano_operativo,          -- Year
+  fecha_operativo,        -- Operation date
+  hora_inicio,            -- Start time
+  hora_fin,               -- End time
+  expediente,             -- File number
+  orden_interna,          -- Internal order
+  ur,                     -- Regional unit ID
+  comisaria,              -- Police station
+  evento,                 -- Event description
+  personas_identificadas, -- Persons identified
+  detenidos_contraventores,
+  detenidos_antecedentes,
+  detenidos_procesados,
+  secuestro_motovehiculo,
+  secuestro_autovehiculo,
+  secuestro_otros,
+  actas_infraccion,
+  licencias_retenidas,
+  alcoholemia,
+  latitud,                -- Latitude coordinate
+  longitud,               -- Longitude coordinate
+  barrio,                 -- Neighborhood
+  fecha_fin,              -- End date
+  observaciones           -- Additional notes
+)
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Accurate Data Entry">
+    - Double-check all numerical values before saving
+    - Ensure dates and times are accurate
+    - Use clear, concise event descriptions
+  </Accordion>
+  
+  <Accordion title="Location Precision">
+    - Always select the exact operation location on the map
+    - Verify coordinates match the intended location
+    - Include neighborhood/district information
+  </Accordion>
+  
+  <Accordion title="Complete Information">
+    - Fill in all required fields
+    - Use the observations field for additional context
+    - Include file and order numbers for tracking
+  </Accordion>
+  
+  <Accordion title="Timely Registration">
+    - Register operations promptly after completion
+    - Ensure all statistics are finalized before entry
+    - Update records if additional information becomes available
+  </Accordion>
+</AccordionGroup>
+
+## Related Features
+
+- [Integrated Operations](/features/integrated-operations) - Multi-unit coordinated operations
+- [Operational Reports](/features/operational-reports) - Generate statistical reports
+- [Personnel Management](/features/personnel-management) - Track officer assignments

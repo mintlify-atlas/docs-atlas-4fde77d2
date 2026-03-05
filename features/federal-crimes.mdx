@@ -1,0 +1,497 @@
+---
+title: 'Federal Crimes'
+description: 'Manage federal crime cases and specialized reporting requirements'
+icon: 'landmark'
+---
+
+## Overview
+
+The Federal Crimes module (`delitos_federales.php`) handles criminal cases that fall under federal jurisdiction, particularly drug trafficking and narcotics-related offenses. This module has specialized fields and reporting requirements distinct from standard preventivos.
+
+<Info>
+  Federal crimes are handled separately from regular preventivos due to different judicial procedures, specialized agencies involved, and specific data requirements for federal reporting.
+</Info>
+
+## When to Use Federal Crimes Module
+
+Use this module for:
+
+- Drug trafficking cases
+- Narcotics seizures
+- Federal law violations
+- Cases involving federal agencies
+- Cross-border criminal activity
+- Major drug busts and interdictions
+
+<Warning>
+  Do not use this module for:
+  - Simple possession cases (use regular preventivos)
+  - Provincial-level crimes
+  - Local drug-related incidents without federal involvement
+</Warning>
+
+## Creating a Federal Crime Report
+
+<Steps>
+  <Step title="Access the Form">
+    Navigate to the federal crimes reporting form from the specialized modules menu
+  </Step>
+  
+  <Step title="Identify Jurisdiction">
+    Select the Regional Unit (UR) and Dependency handling the federal case
+  </Step>
+  
+  <Step title="Enter Case Details">
+    Provide comprehensive information about the federal offense
+  </Step>
+  
+  <Step title="Document Seizures">
+    Record all seized narcotics and evidence with precise quantities and values
+  </Step>
+  
+  <Step title="Record Detentions">
+    Document all detainees with demographic breakdown
+  </Step>
+  
+  <Step title="Submit Report">
+    Save the federal crime record for processing
+  </Step>
+</Steps>
+
+## Required Fields
+
+### Jurisdiction Information
+
+<ParamField path="paises" type="select" required>
+  Regional Unit (Unidad Regional) where the procedure took place. Options include:
+  - Unidad Regional I through XIII
+  - Specialized directories (Operations, GOE, etc.)
+</ParamField>
+
+<ParamField path="estados" type="select" required>
+  Specific police dependency within the regional unit that conducted the operation
+</ParamField>
+
+<Note>
+  The dependency dropdown is dynamically populated via JavaScript based on the selected regional unit.
+</Note>
+
+### Temporal Data
+
+<ParamField path="fecha" type="date" required>
+  Date when the federal procedure/operation was conducted
+</ParamField>
+
+### Crime Classification
+
+<ParamField path="tipo_delito" type="select" required>
+  Type of federal crime. Options from `tipo_delito_federal` table include:
+  - Drug trafficking
+  - International drug smuggling
+  - Large-scale narcotics operations
+  - Other federal violations
+</ParamField>
+
+## Narcotics Information
+
+### Type and Quantity
+
+<ParamField path="tipo_secuestro" type="text" required>
+  Type of narcotics/drugs seized. Specify the substance:
+  - Marijuana
+  - Cocaine
+  - Crack
+  - Heroin
+  - Synthetic drugs
+  - Precursor chemicals
+  - Other controlled substances
+</ParamField>
+
+<ParamField path="cantidad_secuestrada" type="text" required>
+  Quantity seized measured in kilograms (Kgrs).
+  
+  <Tip>
+    Use decimal notation for precise measurements (e.g., 25.5 for 25.5 kg)
+  </Tip>
+</ParamField>
+
+<ParamField path="aforo" type="text" required>
+  Monetary value (aforo) of the seized drugs in Argentine Pesos ($).
+  
+  This appraisal represents the street value of the narcotics.
+</ParamField>
+
+<Warning>
+  **Accurate Measurement**: Ensure quantities and values are precisely recorded as they are used for:
+  - Federal prosecution evidence
+  - Statistical reporting to national agencies
+  - Sentencing guidelines
+  - Budget allocation for anti-drug operations
+</Warning>
+
+### Input Validation
+
+The system includes JavaScript validation for numeric fields:
+
+```javascript
+function check(e) {
+    tecla = (document.all) ? e.keyCode : e.which;
+    
+    // Allow backspace
+    if (tecla == 8) {
+        return true;
+    }
+    
+    // Only accept numbers, periods, and commas
+    patron = /[0-9.,]/;
+    tecla_final = String.fromCharCode(tecla);
+    return patron.test(tecla_final);
+}
+```
+
+This ensures quantities and values contain only valid numeric data.
+
+## Additional Seizures
+
+<ParamField path="otros_secuestros" type="text">
+  Description of other items seized during the operation (up to 70 characters):
+  - Weapons
+  - Vehicles used in trafficking
+  - Cash
+  - Electronic equipment
+  - Drug paraphernalia
+  - Documents
+  - Other evidence
+</ParamField>
+
+## Case Status
+
+<ParamField path="esclarecido" type="select" required>
+  Whether the case has been resolved:
+  - **SI** (Yes) - Investigation complete, charges filed
+  - **NO** (No) - Investigation ongoing
+</ParamField>
+
+## Detention Information
+
+Federal cases require detailed demographic information about detainees:
+
+### Adults Detained
+
+<ParamField path="detenidos_mayores_masculinos" type="number" default="0">
+  Number of adult males (18+ years) detained
+</ParamField>
+
+<ParamField path="detenidos_mayores_femeninos" type="number" default="0">
+  Number of adult females (18+ years) detained
+</ParamField>
+
+### Minors Detained
+
+<ParamField path="detenidos_menores_masculinos" type="number" default="0">
+  Number of minor males (under 18 years) detained
+</ParamField>
+
+<ParamField path="detenidos_menores_femeninos" type="number" default="0">
+  Number of minor females (under 18 years) detained
+</ParamField>
+
+<Warning>
+  **Important**: These fields represent the **count** of detainees, not their ages.
+  
+  For example:
+  - Enter "3" if three adult males were detained
+  - Not "25, 30, 35" (their actual ages)
+</Warning>
+
+### Detainee Names
+
+<ParamField path="nombre_detenido" type="text">
+  Full names of all detained persons (up to 70 characters).
+  
+  If multiple detainees, separate names with commas or semicolons.
+</ParamField>
+
+## Database Storage
+
+Federal crime data is stored in the `delitos_federales` table with structure similar to:
+
+```sql
+CREATE TABLE delitos_federales (
+    id SERIAL PRIMARY KEY,
+    ur VARCHAR,
+    dependencia VARCHAR,
+    fecha DATE,
+    tipo_delito VARCHAR,
+    tipo_secuestro VARCHAR,
+    cantidad_secuestrada NUMERIC,
+    aforo NUMERIC,
+    otros_secuestros VARCHAR,
+    esclarecido VARCHAR,
+    detenidos_mayores_masculinos INTEGER,
+    detenidos_mayores_femeninos INTEGER,
+    detenidos_menores_masculinos INTEGER,
+    detenidos_menores_femeninos INTEGER,
+    nombre_detenido VARCHAR,
+    fecha_carga DATE
+);
+```
+
+## Reporting and Statistics
+
+Federal crime data is used for:
+
+<CardGroup cols={2}>
+  <Card title="Drug Seizure Statistics" icon="pills">
+    Track quantities and types of narcotics intercepted
+  </Card>
+  
+  <Card title="Monetary Impact" icon="dollar-sign">
+    Calculate total street value of seized drugs
+  </Card>
+  
+  <Card title="Detention Analytics" icon="users">
+    Demographic analysis of arrested individuals
+  </Card>
+  
+  <Card title="Federal Coordination" icon="handshake">
+    Share data with federal agencies and prosecutors
+  </Card>
+</CardGroup>
+
+## Integration with Federal Systems
+
+### Data Sharing
+
+Federal crime data may be exported to:
+
+- Ministry of Security of Argentina
+- Federal Police (PFA)
+- SEDRONAR (Secretaría de Políticas Integrales sobre Drogas)
+- Federal prosecutors
+- National crime databases
+
+### Reporting Requirements
+
+Federal authorities typically require:
+
+1. **Quarterly Reports**: Aggregate statistics on seizures and arrests
+2. **Case-by-Case Data**: Detailed information for major operations
+3. **Trend Analysis**: Patterns in drug trafficking routes and methods
+4. **Financial Data**: Total monetary value of intercepted narcotics
+
+## Differences from Regular Preventivos
+
+| Aspect | Regular Preventivos | Federal Crimes |
+|--------|---------------------|----------------|
+| **Jurisdiction** | Provincial/local courts | Federal courts |
+| **Crime Types** | General criminal offenses | Drug trafficking, federal violations |
+| **Required Fields** | Standard incident data | Specialized narcotics information |
+| **Detention Details** | Optional breakdown | Required demographic statistics |
+| **Value Assessment** | Not required | Mandatory drug value calculation |
+| **Reporting** | Local statistics | Federal agency reporting |
+| **Investigation** | Local police | Often multi-agency coordination |
+
+## Multi-Agency Coordination
+
+Federal cases often involve:
+
+- **Local Police**: Initial detection and seizure
+- **Federal Police (PFA)**: Investigation and prosecution support
+- **Border Patrol**: International trafficking cases
+- **Federal Prosecutors**: Legal proceedings
+- **Intelligence Agencies**: Information sharing and analysis
+- **Customs**: Import/export violations
+
+<Info>
+  The Seguridad system serves as the initial reporting point, with data flowing to coordinating agencies as needed.
+</Info>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Precise Measurement">
+    Always weigh narcotics using calibrated scales. Record exact quantities including decimal precision. This data is legally scrutinized.
+  </Accordion>
+  
+  <Accordion title="Chain of Custody">
+    Ensure proper evidence handling procedures are followed. Reference evidence bag numbers and storage locations in additional documentation.
+  </Accordion>
+  
+  <Accordion title="Timely Reporting">
+    Enter federal crime data immediately after seizure. Federal prosecutors need rapid access to information for charging decisions.
+  </Accordion>
+  
+  <Accordion title="Complete Demographics">
+    Provide full demographic breakdown of detainees. This data is used for national policy decisions on drug enforcement.
+  </Accordion>
+  
+  <Accordion title="Accurate Valuation">
+    Use current street price estimates for drug valuation. Consult with narcotics specialists for accurate aforo calculations.
+  </Accordion>
+  
+  <Accordion title="Additional Context">
+    Use the "otros_secuestros" field to document all relevant evidence. This provides prosecutors with complete case context.
+  </Accordion>
+</AccordionGroup>
+
+## Common Federal Case Scenarios
+
+### Large-Scale Drug Bust
+
+<Steps>
+  <Step title="Document Seizure">
+    Record all narcotics types and quantities found
+  </Step>
+  
+  <Step title="Calculate Total Value">
+    Sum the street value of all seized substances
+  </Step>
+  
+  <Step title="List Additional Evidence">
+    Document vehicles, weapons, cash, and other items seized
+  </Step>
+  
+  <Step title="Record All Detainees">
+    Provide complete demographic breakdown and names
+  </Step>
+  
+  <Step title="Coordinate Agencies">
+    Notify federal authorities and prepare for multi-agency investigation
+  </Step>
+</Steps>
+
+### Border Interdiction
+
+For cases at provincial borders or international checkpoints:
+
+1. Document exact location of interdiction
+2. Record vehicle information if applicable
+3. Note travel documents and destination
+4. Calculate quantities and values
+5. Coordinate with customs/border agencies
+
+### Cultivation Operation
+
+For drug cultivation discoveries:
+
+1. Record type of drug being cultivated
+2. Estimate potential yield if mature
+3. Document growing equipment seized
+4. Calculate property value involved
+5. Identify all parties at the location
+
+## Queries and Reports
+
+### Total Seizures by Type
+
+```sql
+SELECT tipo_secuestro, 
+       SUM(cantidad_secuestrada) as total_kg,
+       SUM(aforo) as total_value
+FROM delitos_federales
+WHERE fecha >= '2024-01-01'
+GROUP BY tipo_secuestro
+ORDER BY total_value DESC;
+```
+
+### Monthly Detention Statistics
+
+```sql
+SELECT 
+    TO_CHAR(fecha, 'YYYY-MM') as mes,
+    SUM(detenidos_mayores_masculinos + detenidos_mayores_femeninos) as adultos,
+    SUM(detenidos_menores_masculinos + detenidos_menores_femeninos) as menores
+FROM delitos_federales
+GROUP BY TO_CHAR(fecha, 'YYYY-MM')
+ORDER BY mes DESC;
+```
+
+### Regional Performance
+
+```sql
+SELECT ur,
+       COUNT(*) as operaciones,
+       SUM(cantidad_secuestrada) as kg_total,
+       AVG(aforo) as valor_promedio
+FROM delitos_federales
+WHERE fecha >= CURRENT_DATE - INTERVAL '1 year'
+GROUP BY ur
+ORDER BY operaciones DESC;
+```
+
+## Legal Considerations
+
+<Warning>
+  **Critical**: Federal crime data is subject to:
+  - Judicial evidence requirements
+  - Federal discovery procedures
+  - National security protocols
+  - International treaty obligations
+  
+  Ensure accuracy and completeness of all entries.
+</Warning>
+
+### Evidence Standards
+
+Federal cases require:
+
+- Precise quantity measurements (weight, volume)
+- Photographic documentation (stored separately)
+- Chain of custody records
+- Lab analysis results (linked separately)
+- Witness statements and officer reports
+
+### Privacy Protections
+
+While recording detainee information:
+
+- Follow data protection regulations
+- Limit access to authorized personnel
+- Ensure secure storage of sensitive data
+- Comply with juvenile protection laws for minors
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Cannot Enter Decimal Quantities">
+    The system accepts periods (.) and commas (,) as decimal separators. Use the validation function to ensure proper format:
+    - Correct: 25.5 or 25,5
+    - Incorrect: 25-5 or 25/5
+  </Accordion>
+  
+  <Accordion title="Dependency Not Available">
+    If your dependency isn't listed:
+    - Verify correct Regional Unit is selected
+    - Check that dependency is configured in the system
+    - Contact system administrator to add missing dependency
+  </Accordion>
+  
+  <Accordion title="Value Calculation Unclear">
+    For drug value (aforo) calculation:
+    - Consult current price lists from narcotics division
+    - Use wholesale value for large quantities
+    - Document calculation method in case notes
+    - Coordinate with federal prosecutors for guidance
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Crime Reporting" icon="file-police" href="/features/crime-reporting">
+    Standard preventivo creation for non-federal cases
+  </Card>
+  
+  <Card title="Preventivos Management" icon="folder-open" href="/features/preventivos">
+    Searching and managing regular incident reports
+  </Card>
+  
+  <Card title="Statistics" icon="chart-line" href="/features/statistics">
+    Analyzing federal crime trends and patterns
+  </Card>
+  
+  <Card title="Regional Units" icon="building-shield" href="/admin/regional-units">
+    Managing regional unit and dependency configurations
+  </Card>
+</CardGroup>

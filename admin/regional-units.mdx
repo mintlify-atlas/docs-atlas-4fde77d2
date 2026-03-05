@@ -1,0 +1,537 @@
+---
+title: 'Regional Units'
+description: 'Organizational structure and management of Unidades Regionales (UR 1-15)'
+icon: 'building'
+---
+
+## Overview
+
+The Seguridad system is organized into 15 Regional Units (Unidades Regionales, or URs), each serving a specific geographic jurisdiction. Every regional unit operates with its own dedicated interface while sharing a common database and application structure.
+
+## Regional Unit Structure
+
+<CardGroup cols={3}>
+  <Card title="UR 1" icon="1" href="#ur-1">
+    Unidad Regional 1
+  </Card>
+  <Card title="UR 2" icon="2" href="#ur-2">
+    Unidad Regional 2
+  </Card>
+  <Card title="UR 3" icon="3" href="#ur-3">
+    Unidad Regional 3
+  </Card>
+  <Card title="UR 4" icon="4" href="#ur-4">
+    Unidad Regional 4
+  </Card>
+  <Card title="UR 5" icon="5" href="#ur-5">
+    Unidad Regional 5
+  </Card>
+  <Card title="UR 6" icon="6" href="#ur-6">
+    Unidad Regional 6
+  </Card>
+  <Card title="UR 7" icon="7" href="#ur-7">
+    Unidad Regional 7
+  </Card>
+  <Card title="UR 8" icon="8" href="#ur-8">
+    Unidad Regional 8
+  </Card>
+  <Card title="UR 9" icon="9" href="#ur-9">
+    Unidad Regional 9
+  </Card>
+  <Card title="UR 10" icon="hashtag" href="#ur-10">
+    Unidad Regional 10
+  </Card>
+  <Card title="UR 11" icon="hashtag" href="#ur-11">
+    Unidad Regional 11
+  </Card>
+  <Card title="UR 12" icon="hashtag" href="#ur-12">
+    Unidad Regional 12
+  </Card>
+  <Card title="UR 13" icon="hashtag" href="#ur-13">
+    Unidad Regional 13
+  </Card>
+  <Card title="UR 14" icon="hashtag" href="#ur-14">
+    Unidad Regional 14
+  </Card>
+  <Card title="UR 15" icon="hashtag" href="#ur-15">
+    Unidad Regional 15
+  </Card>
+</CardGroup>
+
+## Directory Structure
+
+Each regional unit has a dedicated directory with identical structure:
+
+```
+Seguridad/
+├── ur1/
+│   ├── cabecera1.php          # Main interface header
+│   ├── index.php              # Unit login page
+│   ├── miconexion.php         # Database connection
+│   ├── menu_preventivos1.php  # Prevention records menu
+│   ├── menu_consulta1.php     # Query menu
+│   ├── menu_informes1.php     # Reports menu
+│   ├── alta_preventivos1.php  # New prevention record
+│   ├── modificar_preventivos1.php
+│   ├── consulta_preventivos_general1.php
+│   ├── consulta_preventivos_judiciales1.php
+│   ├── informe_preventivos1.php
+│   ├── buscar_*.php           # Search functions
+│   ├── variables.php          # Configuration variables
+│   ├── estilo.css            # Styles
+│   ├── imagenes/             # Images and assets
+│   └── form/                 # Form templates
+├── ur2/
+│   └── [same structure]
+├── ur3/
+│   └── [same structure]
+...
+└── ur15/
+    └── [same structure]
+```
+
+## Access Control by Regional Unit
+
+### Permission Routing
+
+Users assigned to a regional unit are automatically routed to their unit's interface:
+
+<CodeGroup>
+```php index.php - Routing Logic
+if (strcmp($row1[0], "1") == 0) {
+    echo "<script>window.location.href = 'ur1/cabecera1.php'</script>";
+}
+else if (strcmp($row1[0], "2") == 0) {
+    echo "<script>window.location.href = 'ur2/cabecera1.php'</script>";
+}
+else if (strcmp($row1[0], "3") == 0) {
+    echo "<script>window.location.href = 'ur3/cabecera1.php'</script>";
+}
+// ... continues for UR 4-15
+```
+</CodeGroup>
+
+### Session Management
+
+Each regional unit validates user sessions:
+
+```php
+// ur[1-15]/miconexion.php
+@session_start();
+
+if (!isset($_SESSION["_usr"])) {
+    echo "Tu no estas autentificado";
+    exit();
+}
+
+$categoria = $_SESSION["_categoria"];
+$user1 = $_SESSION["_usr"];
+```
+
+## Departmental Hierarchy
+
+### Dependencies Table
+
+Each regional unit contains multiple departments (dependencias):
+
+```sql
+SELECT 
+  id_dependencia,
+  dependencia,
+  relacion,
+  direccion,
+  localidad
+FROM dependencias
+WHERE relacion = $ur_number
+ORDER BY dependencia ASC
+```
+
+<Info>
+  The `relacion` field links departments to their parent regional unit (1-15)
+</Info>
+
+### Department Selection
+
+Forms within each UR dynamically populate department dropdowns:
+
+<CodeGroup>
+```php Department Dropdown
+<select name="dependencia" id="dependencia">
+  <?php
+    $query = "SELECT dependencia, dependencia 
+              FROM dependencias 
+              WHERE relacion = $ur2 
+              ORDER BY dependencia ASC";
+    $result = pg_exec($query);
+    
+    while ($row = pg_fetch_row($result)) {
+        echo "<option value='".$row[0]."'>".$row[0]."</option>";
+    }
+  ?>
+</select>
+```
+
+```javascript AJAX Department Loading
+function cargarDependencias(urId, selectDestino) {
+    var ajax = nuevoAjax();
+    ajax.open("GET", 
+        "genera-select.php?id=" + urId, 
+        true);
+    ajax.onreadystatechange = function() {
+        if (ajax.readyState == 4) {
+            document.getElementById(selectDestino).innerHTML = 
+                ajax.responseText;
+        }
+    }
+    ajax.send(null);
+}
+```
+</CodeGroup>
+
+## Unit-Specific Configuration
+
+### Variables Configuration
+
+Each unit can maintain custom variables:
+
+```php
+// ur[1-15]/variables.php
+$ur = "1";  // Regional unit number
+$nombre_ur = "Unidad Regional 1";
+$dependencia_principal = "COMISARIA 1RA";
+```
+
+### Database Connection
+
+All units share the same database but filter by unit:
+
+```php
+// Shared connection parameters
+$host = 'localhost';
+$dbname = '';  // Database name
+$puerto = '5434';
+$user = 'postgres';
+```
+
+## Common Functionality Across Units
+
+### Prevention Records (Preventivos)
+
+<Tabs>
+  <Tab title="Create">
+    **alta_preventivos1.php**
+    
+    - Register new prevention cases
+    - Link to department within unit
+    - Capture incident details
+    - Store crime type, location, date
+  </Tab>
+  
+  <Tab title="Modify">
+    **modificar_preventivos1.php**
+    
+    - Update existing records
+    - Add case notes
+    - Change status
+    - Attach documents
+  </Tab>
+  
+  <Tab title="Query">
+    **consulta_preventivos_general1.php**
+    
+    - Search by date range
+    - Filter by department
+    - Filter by crime type
+    - Export results
+  </Tab>
+  
+  <Tab title="Reports">
+    **informe_preventivos1.php**
+    
+    - Statistical summaries
+    - Crime trends
+    - Department comparisons
+    - Time-series analysis
+  </Tab>
+</Tabs>
+
+### Operations Management
+
+<Steps>
+  <Step title="Register Operation">
+    **registrar_operativo.php**
+    
+    Create new operational activities:
+    - Operation type
+    - Participating units
+    - Date and location
+    - Personnel assigned
+  </Step>
+  
+  <Step title="Track Progress">
+    **listado_operativos.php**
+    
+    Monitor ongoing operations:
+    - Status updates
+    - Resource allocation
+    - Timeline tracking
+  </Step>
+  
+  <Step title="Modify Operation">
+    **modificar_operativo.php**
+    
+    Update operation details:
+    - Change assignments
+    - Add notes
+    - Update status
+  </Step>
+</Steps>
+
+### Accident Management
+
+```php
+// Traffic accident reporting
+alta_preventivos_accidentes1.php
+modificar_accidenteTransito.php
+```
+
+<ParamField path="accidenteTransito" type="module">
+  Track traffic incidents:
+  - Accident type and severity
+  - Vehicles involved
+  - Casualties/injuries
+  - Location and circumstances
+</ParamField>
+
+## Cross-Unit Coordination
+
+### Shared Queries
+
+Administrators can query across all units:
+
+```sql
+SELECT 
+  p.nro_preventivo,
+  p.fecha,
+  p.dependencia,
+  p.delito,
+  d.relacion as unidad_regional
+FROM 
+  preventivos p
+  JOIN dependencias d ON p.dependencia = d.dependencia
+WHERE 
+  d.relacion IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+  AND p.fecha BETWEEN '$fecha_inicio' AND '$fecha_fin'
+ORDER BY 
+  d.relacion, p.fecha DESC
+```
+
+### Administrative Oversight
+
+<AccordionGroup>
+  <Accordion title="Permission Code 0 - System Admin">
+    Full access to all 15 regional units:
+    - View all records
+    - Generate cross-unit reports
+    - Modify any case
+    - Manage users across units
+  </Accordion>
+  
+  <Accordion title="Permission Code 100 - Regional Admin">
+    Administrative functions:
+    - Monitor unit performance
+    - Generate regional statistics
+    - Coordinate multi-unit operations
+  </Accordion>
+</AccordionGroup>
+
+## Data Segregation
+
+### Unit Isolation
+
+While sharing a database, each unit's data is logically separated:
+
+<CodeGroup>
+```sql Department Filter
+-- Users only see their unit's departments
+SELECT * FROM dependencias 
+WHERE relacion = $usuario_ur
+```
+
+```sql Case Filter
+-- Cases filtered by user's department
+SELECT * FROM preventivos 
+WHERE dependencia IN (
+    SELECT dependencia FROM dependencias 
+    WHERE relacion = $usuario_ur
+)
+```
+</CodeGroup>
+
+## Menu Structure by Unit
+
+### Standard Navigation
+
+Each unit provides consistent navigation:
+
+<Tabs>
+  <Tab title="Prevention Menu">
+    ```php
+    // menu_preventivos1.php
+    - Alta de Preventivos (New Case)
+    - Buscar Preventivos (Search)
+    - Modificar Preventivos (Modify)
+    - Ampliación (Expand/Update)
+    ```
+  </Tab>
+  
+  <Tab title="Query Menu">
+    ```php
+    // menu_consulta1.php
+    - Consulta General (General Query)
+    - Consulta Judicial (Judicial Query)
+    - Consulta por Delito (By Crime Type)
+    - Control de Carga (Load Control)
+    ```
+  </Tab>
+  
+  <Tab title="Reports Menu">
+    ```php
+    // menu_informes1.php
+    - Informe Estadístico (Statistical Report)
+    - Informe por Dependencia (By Department)
+    - Informe de Operativos (Operations Report)
+    - Gráficos (Charts)
+    ```
+  </Tab>
+</Tabs>
+
+## Customization by Unit
+
+### Unit-Specific Forms
+
+While structure is shared, units can customize:
+
+<AccordionGroup>
+  <Accordion title="Crime Type Lists">
+    Different regions may track different crime categories:
+    
+    ```php
+    // Customizable per unit
+    $delitos_ur1 = array("Robo", "Hurto", "Lesiones");
+    $delitos_ur2 = array("Robo", "Hurto", "Narcotráfico");
+    ```
+  </Accordion>
+  
+  <Accordion title="Report Templates">
+    Regional variations in report formats:
+    - Custom headers with unit logos
+    - Unit-specific data points
+    - Regional legal requirements
+  </Accordion>
+  
+  <Accordion title="User Interface">
+    Each unit can modify:
+    - CSS styling (estilo.css)
+    - Images and branding
+    - Menu labels and ordering
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Maintain Consistency" icon="equals">
+    Keep core functionality identical across units for easier maintenance and training
+  </Card>
+  
+  <Card title="Document Changes" icon="file-lines">
+    Track any unit-specific customizations in documentation
+  </Card>
+  
+  <Card title="Test Across Units" icon="vial">
+    When updating code, test changes in multiple URs
+  </Card>
+  
+  <Card title="Backup Regularly" icon="floppy-disk">
+    Maintain backups of unit-specific configurations
+  </Card>
+</CardGroup>
+
+## Deployment Workflow
+
+<Steps>
+  <Step title="Update Template">
+    Make changes to a reference unit (e.g., UR1)
+  </Step>
+  
+  <Step title="Test Thoroughly">
+    Validate all functionality in the template unit
+  </Step>
+  
+  <Step title="Replicate">
+    Copy changes to remaining 14 units
+    
+    ```bash
+    for i in {2..15}; do
+        cp ur1/new_file.php ur$i/
+    done
+    ```
+  </Step>
+  
+  <Step title="Adjust Variables">
+    Update unit-specific configuration in each UR
+  </Step>
+  
+  <Step title="Verify">
+    Test functionality in multiple units
+  </Step>
+</Steps>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="User Cannot Access Unit">
+    **Check:**
+    - Permission code matches unit (1-15)
+    - Session variables set correctly
+    - Routing logic in index.php
+    - Department assignment valid
+  </Accordion>
+  
+  <Accordion title="Department List Empty">
+    **Verify:**
+    - `dependencias` table populated
+    - `relacion` field matches UR number
+    - Database connection active
+    - Query permissions granted
+  </Accordion>
+  
+  <Accordion title="Cross-Unit Data Visible">
+    **Review:**
+    - Data filtering by `relacion`
+    - Session `$_categoria` validation
+    - SQL WHERE clauses
+    - User permission level
+  </Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Permissions" icon="shield-check" href="/admin/permissions">
+    Regional unit access codes (1-15)
+  </Card>
+  
+  <Card title="User Management" icon="users" href="/admin/user-management">
+    Assign users to regional units
+  </Card>
+  
+  <Card title="Database Setup" icon="database" href="/admin/database-setup">
+    Dependencies and relations schema
+  </Card>
+  
+  <Card title="System Configuration" icon="gear" href="/admin/system-configuration">
+    Session and routing configuration
+  </Card>
+</CardGroup>

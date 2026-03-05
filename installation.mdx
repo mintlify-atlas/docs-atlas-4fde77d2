@@ -1,0 +1,375 @@
+---
+title: Installation
+description: Complete guide to installing and configuring the Seguridad police management system
+---
+
+## Overview
+
+Seguridad is a PHP-based police security and incident management system designed for regional police units. This guide will walk you through the complete installation process, from system requirements to initial configuration.
+
+## System Requirements
+
+Before installing Seguridad, ensure your server meets the following requirements:
+
+<CardGroup cols={2}>
+  <Card title="Web Server" icon="server">
+    - Apache 2.4+ or Nginx 1.18+
+    - mod_rewrite enabled (Apache)
+    - URL rewriting support
+  </Card>
+  
+  <Card title="PHP" icon="php">
+    - PHP 5.6+ (7.4+ recommended)
+    - PostgreSQL extension (php-pgsql)
+    - Session support enabled
+  </Card>
+  
+  <Card title="Database" icon="database">
+    - PostgreSQL 9.6+ (12+ recommended)
+    - Minimum 2GB storage
+    - UTF-8 encoding support
+  </Card>
+  
+  <Card title="System" icon="computer">
+    - Linux/Unix-based OS (recommended)
+    - 2GB+ RAM
+    - 5GB+ available disk space
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Install Dependencies">
+    First, install the required system packages:
+    
+    <CodeGroup>
+    ```bash Ubuntu/Debian
+    sudo apt update
+    sudo apt install apache2 php php-pgsql postgresql
+    sudo systemctl enable apache2 postgresql
+    sudo systemctl start apache2 postgresql
+    ```
+    
+    ```bash CentOS/RHEL
+    sudo yum install httpd php php-pgsql postgresql-server
+    sudo systemctl enable httpd postgresql
+    sudo postgresql-setup initdb
+    sudo systemctl start httpd postgresql
+    ```
+    </CodeGroup>
+    
+    <Note>
+      Make sure the PostgreSQL extension for PHP is properly enabled in your `php.ini` file.
+    </Note>
+  </Step>
+  
+  <Step title="Configure PostgreSQL">
+    Set up the PostgreSQL database and user:
+    
+    ```bash
+    # Switch to postgres user
+    sudo -u postgres psql
+    ```
+    
+    ```sql
+    -- Create the database
+    CREATE DATABASE seguridad_db;
+    
+    -- Create a user with password
+    CREATE USER seguridad_user WITH PASSWORD 'your_secure_password';
+    
+    -- Grant privileges
+    GRANT ALL PRIVILEGES ON DATABASE seguridad_db TO seguridad_user;
+    
+    -- Exit psql
+    \q
+    ```
+    
+    <Warning>
+      Replace `your_secure_password` with a strong password. Store this securely as you'll need it for configuration.
+    </Warning>
+  </Step>
+  
+  <Step title="Configure PostgreSQL Port">
+    By default, Seguridad connects to PostgreSQL on port **5434**. Update your PostgreSQL configuration:
+    
+    Edit `/etc/postgresql/[version]/main/postgresql.conf`:
+    
+    ```conf
+    port = 5434
+    ```
+    
+    Then restart PostgreSQL:
+    
+    ```bash
+    sudo systemctl restart postgresql
+    ```
+    
+    <Note>
+      Alternatively, you can modify the application to use the default port 5432 by editing the connection files.
+    </Note>
+  </Step>
+  
+  <Step title="Deploy Application Files">
+    Extract and deploy the Seguridad application to your web server:
+    
+    ```bash
+    # Create deployment directory
+    sudo mkdir -p /var/www/seguridad
+    
+    # Copy application files
+    sudo cp -r /path/to/seguridad/source/* /var/www/seguridad/
+    
+    # Set proper permissions
+    sudo chown -R www-data:www-data /var/www/seguridad
+    sudo chmod -R 755 /var/www/seguridad
+    ```
+  </Step>
+  
+  <Step title="Configure Database Connection">
+    Update the database connection settings in the main configuration files:
+    
+    **Edit `index.php` (lines 5-7):**
+    
+    ```php index.php
+    $host = 'localhost';
+    $dbname = 'seguridad_db';  // Update with your database name
+    $puerto = '5434';
+    ```
+    
+    **Edit `miconexion.php` (lines 32-34):**
+    
+    ```php miconexion.php
+    $host = 'localhost';
+    $dbname = 'seguridad_db';  // Update with your database name
+    $puerto = '5434';
+    ```
+    
+    <Warning>
+      **Security Notice:** The current implementation stores database credentials in plain text. In production, consider:
+      - Using environment variables
+      - Implementing a separate configuration file outside the web root
+      - Encrypting sensitive credentials
+    </Warning>
+  </Step>
+  
+  <Step title="Import Database Schema">
+    Import the database schema and initial data:
+    
+    ```bash
+    # If you have a SQL dump file
+    psql -U seguridad_user -d seguridad_db -h localhost -p 5434 < schema.sql
+    ```
+    
+    The database should include at minimum:
+    - **usuario** table: User authentication and permissions
+    - Regional unit tables (UR 1-15)
+    - Incident and case management tables
+    
+    <Note>
+      Contact your system administrator for the complete database schema file if not included.
+    </Note>
+  </Step>
+  
+  <Step title="Configure Web Server">
+    Set up Apache virtual host configuration:
+    
+    Create `/etc/apache2/sites-available/seguridad.conf`:
+    
+    ```apache
+    <VirtualHost *:80>
+        ServerName seguridad.yourdomain.com
+        DocumentRoot /var/www/seguridad
+        
+        <Directory /var/www/seguridad>
+            Options -Indexes +FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>
+        
+        ErrorLog ${APACHE_LOG_DIR}/seguridad_error.log
+        CustomLog ${APACHE_LOG_DIR}/seguridad_access.log combined
+    </VirtualHost>
+    ```
+    
+    Enable the site:
+    
+    ```bash
+    sudo a2ensite seguridad.conf
+    sudo systemctl reload apache2
+    ```
+  </Step>
+  
+  <Step title="Configure PHP Session Settings">
+    Ensure PHP sessions are properly configured:
+    
+    Edit `/etc/php/[version]/apache2/php.ini`:
+    
+    ```ini
+    session.save_handler = files
+    session.save_path = "/var/lib/php/sessions"
+    session.gc_maxlifetime = 1440
+    session.cookie_httponly = 1
+    ```
+    
+    Restart Apache:
+    
+    ```bash
+    sudo systemctl restart apache2
+    ```
+  </Step>
+  
+  <Step title="Verify Installation">
+    Test your installation:
+    
+    1. Open your browser and navigate to `http://seguridad.yourdomain.com/index.php`
+    2. You should see the Seguridad login page
+    3. Check Apache error logs if issues occur:
+    
+    ```bash
+    sudo tail -f /var/log/apache2/seguridad_error.log
+    ```
+  </Step>
+</Steps>
+
+## Initial User Setup
+
+Create an initial administrator user in the database:
+
+```sql
+INSERT INTO usuario (usd, pwd, permisos) 
+VALUES ('admin', 'admin123', '100');
+```
+
+<Warning>
+  **Critical Security Warning:**
+  
+  - Change the default password immediately after first login
+  - The current authentication system is vulnerable to SQL injection
+  - Implement prepared statements for production use
+  - Use password hashing (bcrypt/Argon2) instead of plain text passwords
+</Warning>
+
+## User Permission Levels
+
+The system uses numeric permission codes to control access:
+
+| Permission Code | Role | Access Level |
+|----------------|------|-------------|
+| `0` | System Admin | Full system access |
+| `1-15` | Regional Units | UR1 through UR15 access |
+| `20`, `200` | Consultation | Read-only access |
+| `21-28` | Judicial Access | Court jurisdiction access |
+| `90-99` | Special Units | Operations, toxicology, etc. |
+| `100` | Administrator | Administrative panel |
+| `800-807` | Specialized | Vehicle search, maps, etc. |
+| `4444` | Federal | Federal crimes access |
+| `dirseguridad` | Director | Security director dashboard |
+| `Sub-jefe` | Deputy Chief | Map consultation |
+| `comisaria` | Police Station | Station-level access |
+
+## Post-Installation Configuration
+
+### Configure Session Timeout
+
+Edit `miconexion.php` to adjust session timeout (currently disabled):
+
+```php
+// Uncomment and adjust timeout (in seconds)
+if($tiempo_transcurrido >= 600) { // 10 minutes
+    session_destroy();
+    header("Location: inactivo.php");
+}
+```
+
+### Set Up Regional Units
+
+Create directories for each regional unit if not present:
+
+```bash
+for i in {1..15}; do
+    sudo mkdir -p /var/www/seguridad/ur$i
+    sudo cp /var/www/seguridad/ur1/* /var/www/seguridad/ur$i/
+done
+```
+
+### Configure File Upload Limits
+
+For incident reports with attachments, increase PHP upload limits:
+
+```ini php.ini
+upload_max_filesize = 20M
+post_max_size = 25M
+max_execution_time = 300
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Cannot connect to PostgreSQL">
+    - Verify PostgreSQL is running: `sudo systemctl status postgresql`
+    - Check port configuration in `postgresql.conf`
+    - Verify pg_hba.conf allows connections from localhost
+    - Test connection: `psql -U postgres -h localhost -p 5434`
+  </Accordion>
+  
+  <Accordion title="Login page displays but login fails">
+    - Verify database connection parameters
+    - Check if `usuario` table exists and has data
+    - Review PHP error logs for SQL errors
+    - Ensure php-pgsql extension is loaded: `php -m | grep pgsql`
+  </Accordion>
+  
+  <Accordion title="Session errors or redirects">
+    - Verify session directory permissions: `/var/lib/php/sessions`
+    - Check session configuration in `php.ini`
+    - Clear browser cookies and try again
+    - Review `miconexion.php` session initialization
+  </Accordion>
+  
+  <Accordion title="Missing images or CSS">
+    - Verify file permissions: `chmod -R 755 /var/www/seguridad`
+    - Check Apache configuration for static file serving
+    - Verify `imagenes/` and `SpryAssets/` directories exist
+    - Check browser console for 404 errors
+  </Accordion>
+</AccordionGroup>
+
+## Security Hardening
+
+Before deploying to production, implement these security measures:
+
+<Steps>
+  <Step title="Update Authentication">
+    - Replace plain text passwords with hashed passwords (bcrypt)
+    - Implement prepared statements to prevent SQL injection
+    - Add CSRF token validation for forms
+  </Step>
+  
+  <Step title="Restrict Database Access">
+    - Create a database user with limited privileges
+    - Use environment variables for credentials
+    - Enable PostgreSQL SSL connections
+  </Step>
+  
+  <Step title="Enable HTTPS">
+    - Install SSL certificate (Let's Encrypt recommended)
+    - Force HTTPS redirects
+    - Set secure session cookies
+  </Step>
+  
+  <Step title="Implement Security Headers">
+    - Add CSP, X-Frame-Options, X-XSS-Protection headers
+    - Enable HSTS
+    - Disable directory listing
+  </Step>
+</Steps>
+
+## Next Steps
+
+Once installation is complete, proceed to the [Getting Started](/getting-started) guide to learn how to use the system.
+
+<Card title="Getting Started" icon="rocket" href="/getting-started">
+  Learn how to log in, navigate the system, and perform common tasks
+</Card>

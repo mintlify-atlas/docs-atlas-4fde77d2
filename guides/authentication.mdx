@@ -1,0 +1,273 @@
+---
+title: Authentication
+description: Learn how to authenticate and manage sessions in the Seguridad system
+icon: lock
+---
+
+## Overview
+
+The Seguridad system uses a role-based authentication mechanism that controls access to different modules and functionalities based on user permissions. All authentication is handled through PHP sessions and PostgreSQL database validation.
+
+## Login Process
+
+### Login Form
+
+Users access the system through the main login page (`index.php`) which presents a simple authentication form:
+
+<Steps>
+  <Step title="Enter Credentials">
+    Users must provide their username (`usuario`) and password (`password`) in the login form.
+  </Step>
+  
+  <Step title="Form Validation">
+    Client-side JavaScript validation ensures both fields are not empty before submission.
+    ```javascript
+    function valida(F) {
+      if(vacio(F.usuario.value) == false || vacio(F.password.value) == false) {
+        alert("Todos los campos son obligatorios")
+        return false;
+      }
+      return true;
+    }
+    ```
+  </Step>
+  
+  <Step title="Database Authentication">
+    The system validates credentials against the `usuario` table in PostgreSQL:
+    ```sql
+    SELECT usd, pwd, permisos 
+    FROM usuario 
+    WHERE usd = '$user1' AND pwd = '$pass1'
+    ```
+  </Step>
+  
+  <Step title="Role-Based Routing">
+    Upon successful authentication, users are redirected to their designated module based on their permission level (see [User Roles](/guides/user-roles)).
+  </Step>
+</Steps>
+
+<Warning>
+  The current authentication implementation stores passwords in plain text and uses direct SQL string concatenation. This presents security vulnerabilities that should be addressed in production environments.
+</Warning>
+
+## Session Management
+
+### Session Initialization
+
+When a user successfully logs in, the system creates several session variables:
+
+```php
+$_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s"); // Last access timestamp
+$_SESSION["autentificado"] = "SI";               // Authentication flag
+$_SESSION["_usr"] = $row[0];                      // Username
+$_SESSION["_pass"] = $row[1];                     // Password
+$_SESSION["_categoria"] = $row[2];                // Permission category
+```
+
+### Session Validation
+
+The `miconexion.php` file is included in protected pages to validate user sessions:
+
+<CodeGroup>
+```php Session Check
+if (!isset($_SESSION["_usr"])) {
+  echo "Tu no estas autentificado - RESTRICCION TOTAL -, ingresa <a href='index.php'>aquí</a>"; 
+  exit(); 
+}
+```
+
+```php Session Update
+$_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s"); // Update last access time
+```
+</CodeGroup>
+
+### Session Timeout
+
+The system tracks the last access time but the automatic timeout mechanism is currently commented out in the source code. The original implementation checked for 10-minute inactivity periods:
+
+```php
+// Commented timeout logic
+// if($tiempo_transcurrido >= 600) { // 10 minutes
+//   session_destroy();
+//   header("Location: inactivo.php");
+// }
+```
+
+<Info>
+  Session timeout is currently disabled. Users remain authenticated until they manually log out or the session expires due to server configuration.
+</Info>
+
+## Password Security
+
+### Current Implementation
+
+The system implements basic password handling:
+
+<CardGroup cols={2}>
+  <Card title="Password Storage" icon="database">
+    Passwords are stored in the `pwd` field of the `usuario` table
+  </Card>
+  
+  <Card title="Password Length" icon="ruler">
+    Maximum length: 16 characters
+  </Card>
+  
+  <Card title="Password Input" icon="keyboard">
+    Password fields use HTML `type="password"` for masked input
+  </Card>
+  
+  <Card title="Password Confirmation" icon="check-double">
+    User creation/modification requires password confirmation
+  </Card>
+</CardGroup>
+
+### Password Validation
+
+When creating or modifying users, the system validates that passwords match:
+
+```php
+if ($clave != $confirma) {
+  echo "<script language='javascript'>alert('No coincide el campo Clave con el campo Confirma')</script>";
+}
+```
+
+<Warning>
+  **Security Recommendations:**
+  - Implement password hashing (bcrypt, Argon2)
+  - Add password complexity requirements
+  - Prevent SQL injection with prepared statements
+  - Implement rate limiting for login attempts
+  - Add HTTPS/SSL encryption for data transmission
+</Warning>
+
+## Role-Based Access Control
+
+### Permission System
+
+Access control is managed through the `permisos` field in the `usuario` table. Each permission code determines:
+
+1. **Module Access** - Which functional areas the user can access
+2. **Landing Page** - Where users are redirected after login
+3. **Data Scope** - What regional or departmental data they can view/modify
+
+### Permission Categories
+
+The system uses numeric and text-based permission codes:
+
+<Tabs>
+  <Tab title="Regional Units">
+    - **0** - Administrator (full system access)
+    - **1-15** - Regional Units (UR1 through UR15)
+  </Tab>
+  
+  <Tab title="Judicial">
+    - **20, 200** - General consultation access
+    - **21-27** - First Circumscription Courts (Juzgado 1-7)
+    - **28** - Third Circumscription Court (Juzgado 3)
+  </Tab>
+  
+  <Tab title="Specialized Units">
+    - **90** - Operations
+    - **91** - Data Entry
+    - **92** - Subsecretaría
+    - **93** - Toxicology
+    - **94** - UNICEF
+    - **95** - Home Escape
+    - **96** - Dependent Resources
+    - **97** - Traffic Homicide
+    - **98** - Suicide
+    - **99** - Traffic
+    - **100** - Admin
+    - **4444** - Federal Crimes
+  </Tab>
+  
+  <Tab title="Special Access">
+    - **800** - Vehicle domain search
+    - **801** - Preventive records consultation
+    - **802** - Domestic violence
+    - **803** - Operations
+    - **804** - Internal affairs
+    - **805** - Road safety
+    - **806** - Vehicle verification
+    - **807** - Map consultation
+  </Tab>
+  
+  <Tab title="Text Codes">
+    - **Sub-jefe** - Deputy chief (map access)
+    - **dirseguridad** - Security director
+    - **comisaria** - Police station
+    - **operaciones** - Operations
+  </Tab>
+</Tabs>
+
+For detailed information about each role's permissions, see the [User Roles Guide](/guides/user-roles).
+
+## Logout
+
+Users can end their session by accessing the logout functionality:
+
+```php
+// logout.php
+session_destroy();
+header("Location: index.php");
+```
+
+<Note>
+  The logout option is available in the main navigation menu for all authenticated users.
+</Note>
+
+## Database Connection
+
+The system connects to PostgreSQL with the following configuration:
+
+```php
+$host = 'localhost';
+$dbname = ''; // Database name configured per installation
+$puerto = '5434';
+$user = 'postgres';
+```
+
+<Info>
+  Database connection parameters are hardcoded in `index.php` and `miconexion.php`. Consider moving these to a configuration file for easier maintenance.
+</Info>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Login Failed: Usuario o Clave Incorrectos">
+    This error appears when:
+    - Username doesn't exist in the database
+    - Password doesn't match
+    - Database connection failed
+    
+    **Solution:** Verify credentials with the system administrator.
+  </Accordion>
+  
+  <Accordion title="No estas autentificado - RESTRICCION TOTAL">
+    This message indicates:
+    - Session expired or was never created
+    - Direct access attempt to a protected page
+    
+    **Solution:** Return to the login page and authenticate.
+  </Accordion>
+  
+  <Accordion title="Redirected to Wrong Module">
+    If redirected to the wrong area after login:
+    - Check your `permisos` value in the database
+    - Contact administrator to update your role
+    
+    **Solution:** User permissions need to be updated in the `usuario` table.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="User Roles" icon="users" href="/guides/user-roles">
+    Learn about different user roles and their permissions
+  </Card>
+  
+  <Card title="Navigation" icon="compass" href="/guides/navigation">
+    Explore the system's navigation structure and modules
+  </Card>
+</CardGroup>

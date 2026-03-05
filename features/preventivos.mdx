@@ -1,0 +1,494 @@
+---
+title: 'Preventivos Management'
+description: 'Search, retrieve, and manage preventivo judicial records in the Seguridad system'
+icon: 'folder-open'
+---
+
+## Overview
+
+Preventivos judiciales are the core incident reports in the Seguridad system. This module provides comprehensive tools for searching, viewing, and managing these records throughout their lifecycle.
+
+## What is a Preventivo?
+
+A **preventivo judicial** is an official police incident report that documents:
+
+- Criminal incidents and investigations
+- Complainant and witness information
+- Suspect and victim details
+- Evidence and recovered items
+- Judicial assignments (court, judge, secretary)
+- Location and temporal data
+- Investigation outcomes
+
+<Info>
+  Preventivos are uniquely identified by three components:
+  - **Number** (nro_preventivo)
+  - **Year** (anio_preventivo)
+  - **Dependency** (dependencia)
+</Info>
+
+## Searching for Preventivos
+
+The search interface (`buscarPreventivo.php`) allows you to locate specific preventivo records.
+
+<Steps>
+  <Step title="Access Search Form">
+    Navigate to the preventivo search page from the main menu
+  </Step>
+  
+  <Step title="Enter Search Criteria">
+    Provide the preventivo number, year, and select the regional unit and dependency
+  </Step>
+  
+  <Step title="Execute Search">
+    Click the **Buscar** (Search) button to retrieve the record
+  </Step>
+  
+  <Step title="View Results">
+    The system displays the complete preventivo details in a new window
+  </Step>
+</Steps>
+
+### Search Parameters
+
+<ParamField path="nro" type="number" required>
+  The preventivo number to search for
+</ParamField>
+
+<ParamField path="anio" type="number" required>
+  The year of the preventivo
+</ParamField>
+
+<ParamField path="paises" type="select" required>
+  Regional Unit (Unidad Regional) where the incident was reported. Options include:
+  - Unidad Regional I through XIII
+  - Specialized directorates (Operations, Community Police, etc.)
+</ParamField>
+
+<ParamField path="estados" type="select" required>
+  Specific police dependency within the selected regional unit
+</ParamField>
+
+<Note>
+  The dependency dropdown is dynamically populated based on the selected regional unit using JavaScript.
+</Note>
+
+## Preventivo Record Structure
+
+When you retrieve a preventivo, the following information is displayed:
+
+### Identification Data
+
+| Field | Description |
+|-------|-------------|
+| **ID** | Internal database identifier (id_preventivos) |
+| **Nro. Preventivo** | Preventivo number and year |
+| **Dependencia** | Police dependency that filed the report |
+| **Fecha Preventivo** | Date the preventivo was created |
+| **Fecha Hecho** | Date the incident occurred |
+
+### Parties Involved
+
+| Field | Description |
+|-------|-------------|
+| **Denunciante** | Name of the complainant |
+| **Tipo Doc / Nro Doc** | Complainant's ID document type and number |
+| **Sospechosos** | Suspect names or descriptions |
+| **Inculpado** | Whether suspect is known or unknown |
+| **Sexo/Género Inculpado** | Sex and gender identity of suspect |
+| **Edad Inculpado** | Age range of suspect |
+| **Sexo/Género Víctima** | Sex and gender identity of victim |
+| **Edad Víctima** | Age of victim |
+| **Vínculo** | Relationship between suspect and victim |
+
+### Crime Classification
+
+| Field | Description |
+|-------|-------------|
+| **Hecho** | Type of crime |
+| **Modus Operandi** | How the crime was committed |
+| **Tipo Delito** | Crime category (persons, property, sexual, other) |
+| **Esclarecido** | Whether the case is solved |
+| **Motivo** | What initiated the investigation |
+| **Recupero Sustraído** | Whether stolen items were recovered |
+
+### Location Information
+
+| Field | Description |
+|-------|-------------|
+| **Lugar Hecho** | Location description |
+| **Tipo Lugar** | Type of location (residence, street, commercial, etc.) |
+| **Zona** | Urban or rural |
+| **Barrio/Chacra** | Neighborhood or farm |
+| **Tipo Vía** | Type of road (street, avenue, route) |
+| **Calle** | Street name |
+| **Altura** | Street number |
+| **Intersección** | Cross street |
+| **Nro. Casa** | House number |
+| **Latitud / Longitud** | GPS coordinates |
+| **Dirección GPS** | GPS address |
+| **Localidad** | City/locality |
+
+### Judicial Assignment
+
+| Field | Description |
+|-------|-------------|
+| **Circunscripción Judicial** | Judicial circuit (Posadas, Obera, Eldorado, Puerto Rico) |
+| **Juzgado** | Assigned court of instruction |
+| **Secretaría** | Assigned secretary office |
+
+### Detention Information
+
+| Field | Description |
+|-------|-------------|
+| **Detenido** | Whether there were detentions |
+| **Cantidad Detenidos** | Total number of detainees |
+| **Detenidos por Sexo** | Breakdown by sex (male/female) |
+| **Detenidos por Edad** | Breakdown by age (under 18 / 18 or older) |
+
+### Temporal Data
+
+| Field | Description |
+|-------|-------------|
+| **Horario del Hecho** | Time range when incident occurred (2-hour blocks) |
+| **Fecha Carga** | Date the record was entered into the system |
+
+## Editing Preventivos
+
+The system allows limited editing of existing preventivo records:
+
+<Steps>
+  <Step title="Search for Record">
+    Use the search function to locate the preventivo you want to modify
+  </Step>
+  
+  <Step title="Load for Editing">
+    The search results page includes a "MODIFICAR" (Modify) link
+  </Step>
+  
+  <Step title="Update Fields">
+    Modify the allowed fields (typically location coordinates and modus operandi)
+  </Step>
+  
+  <Step title="Save Changes">
+    Submit the form to update the record
+  </Step>
+</Steps>
+
+<Warning>
+  **Limited Edit Access**: For data integrity, only certain fields can be modified after creation:
+  - Latitude and longitude coordinates
+  - Modus operandi
+  
+  Core incident details (dates, parties involved, crime type) cannot be changed through the edit function.
+</Warning>
+
+## Database Schema
+
+Preventivos are stored in the `preventivos_judiciales` table with the following key structure:
+
+```sql
+CREATE TABLE preventivos_judiciales (
+    id_preventivos SERIAL PRIMARY KEY,
+    nro_preventivo INTEGER NOT NULL,
+    anio_preventivo INTEGER NOT NULL,
+    fecha_preventivo DATE NOT NULL,
+    dependencia VARCHAR NOT NULL,
+    denunciante VARCHAR,
+    tipo_doc VARCHAR,
+    nro_doc VARCHAR,
+    fecha_hecho DATE,
+    sospechosos VARCHAR,
+    hecho VARCHAR,
+    modus_operandi_fk INTEGER,
+    esclarecido VARCHAR,
+    circunscripcion_judicial INTEGER,
+    juzgado INTEGER,
+    secretaria INTEGER,
+    extracto_preventivo TEXT,
+    latitud VARCHAR,
+    longitud VARCHAR,
+    direccion_gps VARCHAR,
+    tipo_lugar_hecho VARCHAR,
+    lugar_hecho VARCHAR,
+    zona VARCHAR,
+    -- Additional fields for detailed location
+    barrio_chacra VARCHAR,
+    tipo_via_lugar_hecho VARCHAR,
+    calle_lugar_hecho VARCHAR,
+    altura_lugar_hecho VARCHAR,
+    interseccion_lugar_hecho VARCHAR,
+    nro_casa_lugar_hecho VARCHAR,
+    -- Suspect information
+    inculpado VARCHAR,
+    sexo_inculpado VARCHAR,
+    genero_inculpado INTEGER,
+    edad_inculpado VARCHAR,
+    -- Victim information
+    sexo_victima VARCHAR,
+    genero_victima INTEGER,
+    edad_victima VARCHAR,
+    vinculo_imputado_victima VARCHAR,
+    -- Detention information
+    detenido VARCHAR,
+    cantidad_detenidos INTEGER,
+    detenido_masculino INTEGER,
+    detenido_femenino INTEGER,
+    detenido_menor_18 INTEGER,
+    detenido_mayor_18 INTEGER,
+    -- Investigation details
+    motivo_origina_instruccion_causa VARCHAR,
+    recupero_sustraido VARCHAR,
+    horario_hecho VARCHAR,
+    fecha_carga DATE,
+    -- Additional fields for special cases
+    -- (traffic deaths, homicides, suicides)
+    ...
+);
+```
+
+## Related Tables
+
+### Fotografias (Photos)
+
+Attached photos are stored in a separate table:
+
+```sql
+CREATE TABLE fotografias (
+    imagen VARCHAR,
+    nro_preventivo INTEGER,
+    anio_preventivo INTEGER,
+    dependencia VARCHAR,
+    direccion INTEGER
+);
+```
+
+### Vehiculos Robados (Stolen Vehicles)
+
+For vehicle theft cases, entries are created in:
+
+```sql
+CREATE TABLE vehiculos_robados (
+    ur VARCHAR,
+    depe VARCHAR,
+    fecha DATE,
+    dni VARCHAR,
+    apeynom VARCHAR,
+    datos_vehiculo VARCHAR,
+    habido VARCHAR,
+    dominio VARCHAR,
+    chasis VARCHAR,
+    motor VARCHAR,
+    nro INTEGER,
+    anio INTEGER,
+    tipo_rodado VARCHAR
+);
+```
+
+## Reporting and Statistics
+
+Preventivo data is used throughout the system for:
+
+<CardGroup cols={2}>
+  <Card title="Crime Statistics" icon="chart-line">
+    Generate reports on crime rates, trends, and patterns by type, location, and time
+  </Card>
+  
+  <Card title="Judicial Assignment" icon="gavel">
+    Track case distribution across courts and secretaries
+  </Card>
+  
+  <Card title="Clearance Rates" icon="check-circle">
+    Monitor investigation outcomes and solved case percentages
+  </Card>
+  
+  <Card title="Geographic Analysis" icon="map-location-dot">
+    Create heat maps and spatial analysis of crime incidents
+  </Card>
+</CardGroup>
+
+## Query Capabilities
+
+The system supports various queries on preventivo data:
+
+### By Time Period
+
+```sql
+SELECT * FROM preventivos_judiciales
+WHERE fecha_preventivo BETWEEN '2024-01-01' AND '2024-12-31'
+ORDER BY fecha_preventivo DESC;
+```
+
+### By Crime Type
+
+```sql
+SELECT hecho, COUNT(*) as cantidad
+FROM preventivos_judiciales
+GROUP BY hecho
+ORDER BY cantidad DESC;
+```
+
+### By Dependency
+
+```sql
+SELECT dependencia, COUNT(*) as total_preventivos
+FROM preventivos_judiciales
+WHERE anio_preventivo = 2024
+GROUP BY dependencia
+ORDER BY total_preventivos DESC;
+```
+
+### By Resolution Status
+
+```sql
+SELECT esclarecido, COUNT(*) as casos
+FROM preventivos_judiciales
+GROUP BY esclarecido;
+```
+
+## Data Integrity Rules
+
+<Warning>
+  **Duplicate Prevention**: The system checks for duplicates before creation:
+  ```sql
+  SELECT COUNT(id_preventivos)
+  FROM preventivos_judiciales
+  WHERE nro_preventivo = ? 
+    AND anio_preventivo = ? 
+    AND dependencia = ?
+  ```
+  If a match is found, creation is blocked.
+</Warning>
+
+<Warning>
+  **Period Closure**: Records cannot be created for dates in closed periods:
+  ```sql
+  SELECT fecha_periodo_cierre
+  FROM fecha_periodo_cierre
+  ```
+  If the preventivo date is before the closure date, creation is denied.
+</Warning>
+
+## Extension Records
+
+Preventivos can have extension records added to them through the `extension` table:
+
+```sql
+INSERT INTO extension VALUES (
+    nro_preventivo,
+    anio_preventivo,
+    dependencia,
+    texto_extension,
+    fecha_extension
+);
+```
+
+These extensions allow additional information to be appended to a case without modifying the original record.
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Unique Identification">
+    Always use the three-part identifier (number, year, dependency) when referencing preventivos. The internal ID is for system use only.
+  </Accordion>
+  
+  <Accordion title="Complete Data Entry">
+    Ensure all required fields are populated during creation. Limited editing capability means corrections are difficult after submission.
+  </Accordion>
+  
+  <Accordion title="Consistent Naming">
+    Use standardized naming conventions for people, places, and addresses to facilitate searching and reporting.
+  </Accordion>
+  
+  <Accordion title="Timely Updates">
+    Add extension records promptly when new information becomes available rather than trying to edit the original.
+  </Accordion>
+  
+  <Accordion title="Coordinate Accuracy">
+    Verify GPS coordinates are accurate as they cannot be easily corrected and are used for spatial analysis.
+  </Accordion>
+</AccordionGroup>
+
+## Common Operations
+
+### Finding Recent Cases
+
+To find the most recent preventivos for a dependency:
+
+<Steps>
+  <Step title="Select Regional Unit">
+    Choose the appropriate Unidad Regional from the dropdown
+  </Step>
+  
+  <Step title="Select Dependency">
+    Choose the specific dependency
+  </Step>
+  
+  <Step title="Sort by Date">
+    Results can be filtered by date range in reporting interfaces
+  </Step>
+</Steps>
+
+### Tracking Case Progress
+
+Monitor case status through:
+
+1. **Esclarecido Field**: Shows if case is solved
+2. **Extension Records**: Additional investigation notes
+3. **Judicial Assignment**: Current court handling the case
+4. **Detention Records**: Any arrests made
+
+### Linking Related Cases
+
+While the system doesn't have formal case linking, related preventivos can be identified by:
+
+- Same victim or suspect names
+- Similar modus operandi
+- Geographic proximity (coordinates)
+- Temporal clustering (dates)
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Preventivo Not Found">
+    Common reasons:
+    - Wrong year entered
+    - Wrong dependency selected
+    - Number transposition error
+    - Case filed under different dependency
+    
+    Try searching with partial information or broader date ranges.
+  </Accordion>
+  
+  <Accordion title="Cannot Modify Record">
+    Most fields are locked after creation for data integrity. If significant corrections are needed, contact system administration or add an extension record with corrections noted.
+  </Accordion>
+  
+  <Accordion title="Duplicate Warning">
+    If you receive a duplicate warning but believe the case is new:
+    - Verify the preventivo number sequence
+    - Check if the case was previously entered by another user
+    - Confirm the correct year is selected
+    - Contact the dependency administrator
+  </Accordion>
+</AccordionGroup>
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="Crime Reporting" icon="file-police" href="/features/crime-reporting">
+    How to create new preventivo reports
+  </Card>
+  
+  <Card title="Federal Crimes" icon="landmark" href="/features/federal-crimes">
+    Handling federal jurisdiction cases
+  </Card>
+  
+  <Card title="Statistics" icon="chart-bar" href="/features/statistics">
+    Generating reports from preventivo data
+  </Card>
+  
+  <Card title="Maps" icon="map" href="/features/maps">
+    Visualizing preventivo locations
+  </Card>
+</CardGroup>

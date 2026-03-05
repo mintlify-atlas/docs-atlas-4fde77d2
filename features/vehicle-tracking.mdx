@@ -1,0 +1,416 @@
+---
+title: Vehicle Tracking
+description: Stolen vehicle registration and recovery tracking system with comprehensive search capabilities
+---
+
+The Vehicle Tracking module provides a complete system for registering stolen vehicles, tracking recoveries, and searching the stolen vehicle database using multiple criteria.
+
+## Overview
+
+This module enables law enforcement to:
+
+- Register stolen vehicle reports
+- Track vehicle recovery status
+- Search by license plate, chassis, or engine number
+- Monitor vehicle theft patterns
+- Document vehicle and owner information
+- Update recovery status and location
+
+## Vehicle Registration System
+
+### Stolen Vehicle Report
+
+When a vehicle theft is reported, comprehensive information is captured:
+
+<Steps>
+  <Step title="Jurisdictional Information">
+    - **Regional Unit (Unidad)**: Select from UR-1 through UR-12
+    - **Dependency (Dependencia)**: Select the specific police station
+    - Auto-populated based on Regional Unit selection
+  </Step>
+
+  <Step title="Report Details">
+    - **Date (Fecha)**: Date of theft report
+    - **Preventive Number (NRO PREV)**: Case number
+    - **Preventive Year (AÑO PREV)**: Report year
+    - **Location (Localidad)**: City or town where theft occurred
+  </Step>
+
+  <Step title="Owner Information">
+    - **DNI**: National ID of vehicle owner
+    - **Name (APELLIDO NOMBRE/S)**: Full name of owner
+  </Step>
+
+  <Step title="Vehicle Information">
+    - Vehicle type, identification numbers, and characteristics
+  </Step>
+</Steps>
+
+### Vehicle Identification
+
+<Tabs>
+  <Tab title="Vehicle Type">
+    **Tipo de Rodado** (Vehicle Class):
+    
+    <CardGroup cols={2}>
+      <Card title="AUTOMOTOR" icon="car">
+        Standard automobiles
+      </Card>
+      
+      <Card title="MOTOVEHICULO" icon="motorcycle">
+        Motorcycles and motorbikes
+      </Card>
+      
+      <Card title="CAMION" icon="truck">
+        Trucks and commercial vehicles
+      </Card>
+      
+      <Card title="TRACTOR" icon="tractor">
+        Tractors and agricultural vehicles
+      </Card>
+    </CardGroup>
+  </Tab>
+
+  <Tab title="Identification Numbers">
+    **Critical Vehicle Identifiers:**
+    
+    ```php
+    [
+      "dominio"   => "License plate (e.g., XXX123)",
+      "chasis"    => "Chassis number",
+      "motor"     => "Engine number"
+    ]
+    ```
+    
+    <Warning>
+    **Unique Validation**: The system prevents duplicate entries by checking if the license plate already exists in the database.
+    </Warning>
+  </Tab>
+
+  <Tab title="Vehicle Description">
+    **Descriptive Information:**
+    
+    1. **Marca, Modelo del Rodado**: Brand and model
+    2. **Caracteristicas del Vehiculo**: Distinguishing features such as:
+       - Color
+       - Body damage
+       - Special modifications
+       - Identifying marks
+       - Accessories
+  </Tab>
+</Tabs>
+
+### Duplicate Prevention
+
+The system validates each vehicle registration:
+
+```php
+// Duplicate check logic
+$sql = "SELECT COUNT(cod)
+        FROM vehiculos_robados
+        WHERE dominio='$dominio'";
+        
+if ($row[0] > 0) {
+    alert('EL DOMINIO $dominio YA ESTA CARGADO');
+    // Registration blocked
+}
+```
+
+<Info>
+If a license plate is already registered as stolen, the system prevents duplicate entry and alerts the officer.
+</Info>
+
+## Recovery Tracking
+
+### Recovery Status
+
+The system tracks whether stolen vehicles have been recovered:
+
+<AccordionGroup>
+  <Accordion title="Recovery Status Field">
+    **HABIDO** (Located/Recovered):
+    - **SELECCIONAR**: Default/Not yet determined
+    - **SI**: Vehicle has been recovered
+    - **NO**: Vehicle still missing
+  </Accordion>
+
+  <Accordion title="Recovery Details">
+    When a vehicle is recovered (HABIDO = SI), additional fields capture:
+    
+    ```php
+    [
+      "fecha2"       => "Recovery date",
+      "lugarHabido"  => "Location where found"
+    ]
+    ```
+    
+    These fields document:
+    - Exact date of recovery
+    - Precise location where vehicle was found
+    - Can be updated after initial report
+  </Accordion>
+</AccordionGroup>
+
+### Database Storage
+
+Complete vehicle records are stored with all details:
+
+```php
+INSERT INTO vehiculos_robados VALUES(
+    '$ur',           // Regional unit
+    '$depe',         // Dependency
+    '$fecha',        // Report date
+    '$dni',          // Owner DNI
+    '$apeynom',      // Owner name
+    '$vehiculo2',    // Vehicle characteristics
+    '$habido',       // Recovery status
+    '$fecha2',       // Recovery date
+    '$localidad',    // Theft location
+    '$lugarHabido',  // Recovery location
+    '$vehiculo',     // Make/model
+    '$vehiculo3',    // Vehicle type
+    '$dominio',      // License plate
+    '$chasis',       // Chassis number
+    '$motor',        // Engine number
+    $nro,            // Preventive number
+    $anio            // Preventive year
+)
+```
+
+## Vehicle Search System
+
+The search interface (buscar_dominio.php) provides multiple search methods:
+
+### Search Options
+
+<CardGroup cols={2}>
+  <Card title="License Plate Search" icon="hashtag">
+    **NRO DE DOMINIO**
+    
+    Search by license plate number
+    - Format: XXX123
+    - Case-insensitive
+    - Partial matching supported
+  </Card>
+
+  <Card title="Chassis Number Search" icon="barcode">
+    **NRO DE CHASIS**
+    
+    Search by chassis/VIN
+    - Up to 30 characters
+    - Partial matching supported
+    - Exact identification
+  </Card>
+
+  <Card title="Engine Number Search" icon="engine">
+    **NRO DE MOTOR**
+    
+    Search by engine number
+    - Up to 30 characters
+    - Partial matching supported
+    - Alternative identification
+  </Card>
+
+  <Card title="Brand Search" icon="car-side">
+    **MARCA**
+    
+    Search by vehicle brand
+    - Make/model matching
+    - Partial text search
+    - Broad category search
+  </Card>
+</CardGroup>
+
+### Search Implementation
+
+Each search method uses pattern matching:
+
+<CodeGroup>
+```sql License Plate Search
+SELECT fecha, ur, depe, dni, apeynom, dominio,
+       datos_vehiculo, fecha_ubicacion, lugar_habido,
+       cod, habido, nro, anio, chasis, motor
+FROM vehiculos_robados 
+WHERE dominio ILIKE '%$dominio%'
+```
+
+```sql Chassis Search
+SELECT fecha, ur, depe, dni, apeynom, dominio,
+       datos_vehiculo, fecha_ubicacion, lugar_habido,
+       cod, habido, nro, anio, chasis, motor
+FROM vehiculos_robados 
+WHERE chasis ILIKE '%$chasis%'
+```
+
+```sql Engine Number Search
+SELECT fecha, ur, depe, dni, apeynom, dominio,
+       datos_vehiculo, fecha_ubicacion, lugar_habido,
+       cod, habido, nro, anio, chasis, motor
+FROM vehiculos_robados 
+WHERE motor ILIKE '%$motor%'
+```
+
+```sql Brand Search
+SELECT fecha, ur, depe, dni, apeynom, dominio,
+       datos_vehiculo, fecha_ubicacion, lugar_habido,
+       cod, habido, nro, anio, chasis, motor
+FROM vehiculos_robados 
+WHERE datos_vehiculo ILIKE '%$marca%'
+```
+</CodeGroup>
+
+<Tip>
+**Partial Matching**: All searches use ILIKE for case-insensitive partial matching, allowing flexible searches even with incomplete information.
+</Tip>
+
+## Search Results Display
+
+Results are presented in a comprehensive table format:
+
+### Results Table Columns
+
+| Column | Description |
+|--------|-------------|
+| **FECHA** | Date theft was reported |
+| **UNIDAD** | Regional Unit handling case |
+| **NRO PREVENTIVO** | Case number (NRO/AÑO format) |
+| **DEPENDENCIA** | Specific police station |
+| **DNI** | Owner identification |
+| **APELLIDO Y NOMBRES** | Owner full name |
+| **DOMINIO** | License plate |
+| **MARCA** | Vehicle make/model/characteristics |
+| **CHASIS** | Chassis number |
+| **MOTOR** | Engine number |
+| **HABIDO** | Recovery status (SI/NO) |
+| **FECHA HABIDO** | Recovery date (if found) |
+| **LUGAR HABIDO** | Recovery location (if found) |
+
+### No Results Handling
+
+```php
+if ($row[0] == 0) {
+    echo "NO SE ENCONTRO NINGUN REGISTRO";
+    // Display "No records found" message
+}
+```
+
+<Info>
+The system provides clear feedback when searches return no results, allowing officers to refine their search criteria.
+</Info>
+
+## Workflow Examples
+
+### Registering a Stolen Vehicle
+
+<Steps>
+  <Step title="Access Registration Form">
+    Navigate to Vehicle Tracking module and select "Register Stolen Vehicle"
+  </Step>
+
+  <Step title="Select Jurisdiction">
+    - Choose Regional Unit
+    - Select Dependency (auto-populates based on UR)
+  </Step>
+
+  <Step title="Enter Report Details">
+    - Date of theft
+    - Preventive case number and year
+    - Location of theft
+  </Step>
+
+  <Step title="Document Owner">
+    - Owner's DNI
+    - Owner's full name
+  </Step>
+
+  <Step title="Vehicle Information">
+    - Select vehicle type
+    - Enter license plate (format: XXX123)
+    - Enter chassis number
+    - Enter engine number
+    - Describe make, model, and characteristics
+  </Step>
+
+  <Step title="Initial Recovery Status">
+    - Set HABIDO to "NO" (not yet recovered)
+    - Leave recovery date and location blank
+  </Step>
+
+  <Step title="Submit Registration">
+    Click GUARDAR (Save) - system validates uniqueness and saves
+  </Step>
+</Steps>
+
+### Updating Recovery Status
+
+<Steps>
+  <Step title="Search for Vehicle">
+    Use license plate, chassis, or engine number to find the record
+  </Step>
+
+  <Step title="Open Record for Edit">
+    Access the vehicle record from search results
+  </Step>
+
+  <Step title="Update Recovery Fields">
+    - Change HABIDO to "SI"
+    - Enter recovery date (FECHA UBICACION)
+    - Enter recovery location (LUGAR HABIDO)
+  </Step>
+
+  <Step title="Save Changes">
+    System updates record with recovery information
+  </Step>
+</Steps>
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Accurate Identification Numbers">
+    Always verify chassis and engine numbers carefully as these are primary identifiers for vehicle recovery.
+    
+    <Warning>
+    Incorrect identification numbers can prevent successful recovery identification.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Detailed Descriptions">
+    Include as much detail as possible in the vehicle characteristics field:
+    - Exact color
+    - Distinctive marks or damage
+    - Aftermarket modifications
+    - Special features or accessories
+  </Accordion>
+
+  <Accordion title="Prompt Registration">
+    Register stolen vehicles immediately to maximize chances of recovery and enable rapid database checks.
+  </Accordion>
+
+  <Accordion title="Recovery Updates">
+    Update recovery status promptly to maintain database accuracy and prevent unnecessary searches.
+  </Accordion>
+</AccordionGroup>
+
+## Data Integrity
+
+<CardGroup cols={2}>
+  <Card title="Validation" icon="shield-check">
+    - License plate uniqueness check
+    - Required field validation
+    - Date format verification
+    - Regional unit assignment
+  </Card>
+
+  <Card title="Data Quality" icon="medal">
+    - Standardized vehicle types
+    - Consistent date formats
+    - Normalized location data
+    - Complete identification numbers
+  </Card>
+</CardGroup>
+
+## Related Modules
+
+- [Traffic Accidents](/features/traffic-accidents) - Cross-reference stolen vehicles in accidents
+- [Statistics Dashboard](/features/statistics) - Analyze vehicle theft patterns
+- [Reports](/features/reports) - Generate stolen vehicle reports by jurisdiction

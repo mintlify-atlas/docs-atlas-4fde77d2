@@ -1,0 +1,269 @@
+---
+title: "Map Visualization"
+description: "Interactive geographic visualization of crime incidents and police operations"
+icon: "map-location-dot"
+---
+
+The Seguridad system includes powerful map visualization capabilities for displaying crime incidents and police operations geographically.
+
+## Overview
+
+Map visualization helps identify crime patterns, hotspots, and operational coverage areas. The system supports two main map types: crime incident mapping and operations mapping.
+
+## Crime Incident Mapping
+
+### Access Point
+
+The main crime map interface is accessed through `consultaMapa.php`, which provides filtering options before displaying the map via `resultadoMapa.php`.
+
+### Map Query Parameters
+
+<ParamField path="ur" type="select" required>
+  **Regional Unit**
+  
+  Select the regional unit (Unidad Regional) to display. Choose "TODOS" to show incidents from all units.
+</ParamField>
+
+<ParamField path="dependencia" type="select">
+  **Department**
+  
+  Filter by specific police department. This field is dynamically populated based on the selected regional unit.
+</ParamField>
+
+<ParamField path="desde" type="text" required>
+  **Start Date**
+  
+  Date in DD-MM-YYYY format. Defaults to current date.
+</ParamField>
+
+<ParamField path="hasta" type="text" required>
+  **End Date**
+  
+  Date in DD-MM-YYYY format. Defaults to current date.
+</ParamField>
+
+<ParamField path="tipo_delito" type="select">
+  **Crime Type**
+  
+  Filter map markers by specific crime type. Options include:
+  - TODOS (All types)
+  - Individual crime types from the `tipo_delito` table
+</ParamField>
+
+<ParamField path="modus_operandi" type="select">
+  **Modus Operandi**
+  
+  Filter by crime method or pattern. Select "TODOS" for all patterns or choose a specific modus operandi.
+</ParamField>
+
+<ParamField path="esclarecidos" type="select" default="T">
+  **Case Status**
+  
+  - `T`: TODOS (Show all incidents)
+  - `S`: SI (Show only solved cases)
+  - `N`: NO (Show only unsolved cases)
+</ParamField>
+
+### Crime Map Features
+
+<CardGroup cols={2}>
+  <Card title="Geographic Plotting" icon="location-dot">
+    Each crime incident is plotted as a marker on the map based on its location coordinates.
+  </Card>
+  
+  <Card title="Incident Details" icon="circle-info">
+    Click on map markers to view detailed information about specific incidents.
+  </Card>
+  
+  <Card title="Multi-Layer Display" icon="layer-group">
+    Display multiple crime types simultaneously with different marker styles.
+  </Card>
+  
+  <Card title="Date Range Filtering" icon="calendar-days">
+    View crime patterns over specific time periods.
+  </Card>
+</CardGroup>
+
+## Operations Mapping
+
+### Access Point
+
+Police operations are mapped through `consultaMapaOperativos.php`, with results displayed via `resultadoMapaOperativos.php`.
+
+### Operations Map Parameters
+
+<ParamField path="ur" type="select" required>
+  **Regional Unit**
+  
+  Select the unit to display operations for, or "TODOS" for all units.
+</ParamField>
+
+<ParamField path="dependencia" type="select">
+  **Police Stations (Comisarías)**
+  
+  Filter operations by specific police station. The dropdown populates based on the selected regional unit.
+  
+  When "TODOS" is selected for the unit, the station dropdown automatically shows "TODOS" and becomes disabled.
+</ParamField>
+
+<ParamField path="desde" type="date" required>
+  **Start Date**
+  
+  Operations start date in YYYY-MM-DD format.
+</ParamField>
+
+<ParamField path="hasta" type="date" required>
+  **End Date**
+  
+  Operations end date in YYYY-MM-DD format.
+</ParamField>
+
+<Warning>
+  Similar to crime statistics, when querying all units and departments, the date range should not exceed 1 year to prevent system overload.
+</Warning>
+
+### Operations Map Features
+
+<AccordionGroup>
+  <Accordion title="Operation Locations">
+    Display the geographic locations where police operations were conducted, including:
+    - Checkpoints
+    - Patrols
+    - Special operations
+    - Control points
+  </Accordion>
+
+  <Accordion title="Coverage Analysis">
+    Visualize police operational coverage across different regions and time periods.
+  </Accordion>
+
+  <Accordion title="Resource Allocation">
+    Understand where police resources are being deployed geographically.
+  </Accordion>
+</AccordionGroup>
+
+## Map Interface Components
+
+### Interactive Controls
+
+<Steps>
+  <Step title="Pan and Zoom">
+    Navigate the map by dragging to pan and using scroll wheel or zoom controls to adjust the view level.
+  </Step>
+  
+  <Step title="Marker Selection">
+    Click on individual markers to view detailed information about incidents or operations.
+  </Step>
+  
+  <Step title="Layer Toggle">
+    Enable or disable different data layers to focus on specific information.
+  </Step>
+  
+  <Step title="Filter Adjustment">
+    Modify filters and refresh the map to update displayed data.
+  </Step>
+</Steps>
+
+### Map Legends
+
+The map interface provides legends to distinguish:
+- Different crime types (by marker color or icon)
+- Solved vs. unsolved cases
+- Different operational categories
+- Time periods
+
+## Technical Implementation
+
+### Data Loading
+
+```javascript
+// Example: Dependent dropdown for departments
+function cargaDependencias(selectId) {
+  // Loads departments based on selected regional unit
+  // Uses AJAX to fetch data from the server
+  // Updates the dependencia dropdown dynamically
+}
+```
+
+### Map Rendering
+
+The system likely uses a JavaScript mapping library (such as Google Maps, Leaflet, or OpenLayers) to:
+
+1. Initialize the map with appropriate center and zoom level
+2. Plot markers based on query results
+3. Attach popup/tooltip information to each marker
+4. Handle user interactions
+
+## Query Workflow
+
+<Steps>
+  <Step title="Access Map Interface">
+    Navigate to either the crime map or operations map page.
+  </Step>
+  
+  <Step title="Select Geographic Scope">
+    Choose the regional unit and optionally a specific department.
+  </Step>
+  
+  <Step title="Set Time Period">
+    Define the date range for incidents or operations to display.
+  </Step>
+  
+  <Step title="Apply Filters">
+    For crime maps, optionally filter by crime type, modus operandi, and case status.
+  </Step>
+  
+  <Step title="Generate Map">
+    Click "BUSCAR" to load the map in a new window with plotted locations.
+  </Step>
+  
+  <Step title="Interact with Map">
+    Explore the map, click markers for details, and analyze geographic patterns.
+  </Step>
+</Steps>
+
+## Use Cases
+
+<CardGroup cols={2}>
+  <Card title="Hotspot Identification" icon="fire">
+    Identify areas with high crime concentration to focus patrol resources.
+  </Card>
+  
+  <Card title="Pattern Analysis" icon="magnifying-glass-chart">
+    Discover geographic patterns in crime types, times, or methods.
+  </Card>
+  
+  <Card title="Operations Planning" icon="route">
+    Plan future operations based on historical incident locations.
+  </Card>
+  
+  <Card title="Resource Deployment" icon="users-gear">
+    Optimize police resource allocation based on geographic crime data.
+  </Card>
+  
+  <Card title="Reporting" icon="presentation">
+    Generate visual reports for briefings and public information.
+  </Card>
+  
+  <Card title="Trend Monitoring" icon="chart-line">
+    Track how crime patterns shift geographically over time.
+  </Card>
+</CardGroup>
+
+## Performance Notes
+
+<Info>
+  For optimal map performance, limit queries to specific regions and reasonable time periods. Province-wide queries with extensive date ranges may result in slower loading times due to the large number of markers.
+</Info>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Crime Statistics" icon="chart-bar" href="/features/statistics">
+    View detailed statistical reports and data tables
+  </Card>
+  
+  <Card title="Reports" icon="file-export" href="/features/reports">
+    Generate formal reports and export data
+  </Card>
+</CardGroup>

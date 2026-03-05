@@ -1,0 +1,340 @@
+---
+title: Homicides
+description: Comprehensive homicide case management system for investigating and tracking murder cases including femicides
+---
+
+The Homicides module provides law enforcement with tools to document, investigate, and track homicide cases including detailed victim information, suspect data, and case circumstances.
+
+## Overview
+
+This specialized module handles:
+
+- Homicide and femicide case registration
+- Victim profile documentation
+- Suspect/perpetrator information
+- Motive and circumstance tracking
+- Weapon classification
+- Relationship analysis between victim and perpetrator
+- Investigation status monitoring
+
+## Case Registration Workflow
+
+### Basic Case Information
+
+<Steps>
+  <Step title="Jurisdictional Data">
+    Select the Regional Unit (UR) and specific police dependency handling the case.
+  </Step>
+  
+  <Step title="Case Identification">
+    Enter the preventive report number and year for case tracking.
+  </Step>
+  
+  <Step title="Date Recording">
+    Document the date of the incident using the date picker.
+  </Step>
+</Steps>
+
+### Victim Information
+
+Detailed victim data is essential for investigation:
+
+<CodeGroup>
+```json Required Fields
+{
+  "victima": "Last name and first name",
+  "edad": "Age of victim",
+  "sexo": "F or M (required)"
+}
+```
+
+```json Case Classification
+{
+  "tipo_hecho": [
+    "HOMICIDIO",
+    "FEMICIDIO"
+  ]
+}
+```
+</CodeGroup>
+
+<Note>
+**Femicide Classification**: Cases involving female victims killed due to gender-based violence are classified as FEMICIDIO for specialized tracking and reporting.
+</Note>
+
+## Investigation Details
+
+### Motivation Analysis
+
+The system tracks various motives behind homicides:
+
+<AccordionGroup>
+  <Accordion title="Motivation Categories">
+    The database includes a comprehensive list of potential motives stored in the `homicidio_motivos` table:
+    - Criminal activity related
+    - Domestic violence
+    - Robbery
+    - Revenge
+    - Drug-related
+    - Other classified motives
+  </Accordion>
+
+  <Accordion title="Relationship Classification">
+    Understanding the victim-perpetrator relationship is crucial for investigation:
+    
+    ```sql
+    SELECT id, descripcion 
+    FROM homicidio_relacion
+    ```
+    
+    Common relationships tracked:
+    - Family member
+    - Partner/spouse
+    - Acquaintance
+    - Stranger
+    - Unknown
+  </Accordion>
+</AccordionGroup>
+
+### Crime Modality
+
+The system categorizes how the homicide was committed:
+
+```php
+// Crime modality options from database
+SELECT descripcion 
+FROM homicidio_modalidad
+```
+
+<CardGroup cols={2}>
+  <Card title="Method Classification" icon="list">
+    - Premeditated
+    - Crime of passion
+    - During commission of another crime
+    - Accident escalation
+  </Card>
+
+  <Card title="Circumstantial Factors" icon="magnifying-glass">
+    - Location type
+    - Time of day
+    - Witnesses present
+    - Associated criminal activity
+  </Card>
+</CardGroup>
+
+## Weapon Documentation
+
+### Weapon Type Classification
+
+The system includes a comprehensive weapon tracking system:
+
+<Tabs>
+  <Tab title="Weapon Selection">
+    ```php
+    SELECT descripcion 
+    FROM homicidio_tipo_armas
+    ```
+    
+    Available weapon categories:
+    - Firearm
+    - Bladed weapon
+    - Blunt object
+    - Strangulation
+    - Other methods
+  </Tab>
+
+  <Tab title="Weapon Description">
+    When a weapon type is selected, a detailed description field becomes available:
+    
+    ```html
+    <input name="descripcion_arma" 
+           type="text" 
+           id="descripcion_arma" 
+           size="50">
+    ```
+    
+    Enter specific details such as:
+    - Caliber (for firearms)
+    - Blade length
+    - Object description
+    - Weapon recovery status
+  </Tab>
+</Tabs>
+
+<Warning>
+**Evidence Documentation**: Weapon information is critical for forensic analysis and prosecution. Ensure accuracy in all weapon-related fields.
+</Warning>
+
+## Suspect Information
+
+### Perpetrator Documentation
+
+The system captures suspect information when available:
+
+<CodeGroup>
+```php Suspect Field
+<input name="autor" 
+       type="text" 
+       id="autor" 
+       size="50">
+```
+
+```text Information to Include
+- Full name (if known)
+- Alias or description
+- Relationship to victim
+- Known location
+- Arrest status
+```
+</CodeGroup>
+
+<Info>
+**Investigation Status**: The suspect field can be left blank for unsolved cases and updated as the investigation progresses.
+</Info>
+
+## Form Structure
+
+### Complete Data Collection
+
+The homicide reporting form collects information in this sequence:
+
+1. **Administrative Data**
+   - Regional Unit
+   - Dependency
+   - Preventive report number and year
+   - Date of incident
+
+2. **Victim Profile**
+   - Full name
+   - Age
+   - Gender
+
+3. **Case Classification**
+   - Type (Homicide/Femicide)
+   - Motivation
+   - Victim-perpetrator relationship
+
+4. **Crime Details**
+   - Modality
+   - Weapon type and description
+
+5. **Investigation Data**
+   - Suspect information
+   - Case status
+
+## Database Operations
+
+### Case Submission
+
+```php
+// Form submission trigger
+<input name="GUARDAR9" 
+       type="submit" 
+       value="GUARDAR">
+```
+
+The system validates required fields:
+- Regional Unit
+- Dependency
+- Preventive report number and year
+- Date
+- Victim name
+- Gender
+- Case type
+- Relationship classification
+- Modality
+
+### Case Display and Reporting
+
+```php
+// Display existing cases
+<input type="submit" 
+       name="MOSTRAR" 
+       value="MOSTRAR">
+```
+
+<Tip>
+Use the MOSTRAR (Show) button to review existing cases before creating new entries, preventing duplicate case registration.
+</Tip>
+
+## Investigation Tracking
+
+### Case Status Management
+
+While not explicitly visible in the form, the system supports tracking:
+
+<CardGroup cols={3}>
+  <Card title="Open Cases" icon="folder-open">
+    Active investigations
+  </Card>
+  
+  <Card title="Under Investigation" icon="magnifying-glass">
+    Cases with active leads
+  </Card>
+  
+  <Card title="Resolved" icon="check-circle">
+    Solved cases with arrests
+  </Card>
+</CardGroup>
+
+## Data Analysis Capabilities
+
+The homicide database enables:
+
+<AccordionGroup>
+  <Accordion title="Femicide Statistics">
+    Generate specific reports on gender-based violence and femicide rates across jurisdictions.
+  </Accordion>
+
+  <Accordion title="Motive Patterns">
+    Analyze common motives in different regions to inform prevention strategies.
+  </Accordion>
+
+  <Accordion title="Weapon Analysis">
+    Track weapon types used in homicides for policy and enforcement planning.
+  </Accordion>
+
+  <Accordion title="Clearance Rates">
+    Monitor investigation success rates and case resolution timelines.
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Warning>
+**Sensitive Information**: Homicide cases contain highly sensitive data. Ensure proper access controls and data protection measures are in place.
+</Warning>
+
+<Note>
+**Continuous Updates**: Case records should be updated as investigations progress, particularly regarding suspect information and case status.
+</Note>
+
+<Tip>
+**Relationship Documentation**: Accurate victim-perpetrator relationship classification is crucial for domestic violence and femicide tracking.
+</Tip>
+
+## Required Fields Summary
+
+| Field | Type | Required | Options |
+|-------|------|----------|----------|
+| Regional Unit | Select | Yes | UR-1 through UR-15 |
+| Dependency | Select | Yes | From dependencies table |
+| Preventive Number | Text | Yes | - |
+| Preventive Year | Text | Yes | - |
+| Date | Date | Yes | Date picker |
+| Victim Name | Text | Yes | - |
+| Age | Text | No | - |
+| Gender | Select | Yes | F/M |
+| Case Type | Select | Yes | HOMICIDIO/FEMICIDIO |
+| Motivation | Select | No | From motivos table |
+| Relationship | Select | Yes | From relacion table |
+| Modality | Select | Yes | From modalidad table |
+| Weapon Type | Select | No | From tipo_armas table |
+| Weapon Description | Text | No | - |
+| Perpetrator | Text | No | - |
+
+## Related Modules
+
+- [Traffic Accidents](/features/traffic-accidents) - For vehicular homicides
+- [Family Violence](/features/family-violence) - For domestic violence escalation cases
+- [Statistics Dashboard](/features/statistics) - For comprehensive crime analysis

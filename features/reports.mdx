@@ -1,0 +1,354 @@
+---
+title: "Reports & Forms"
+description: "Generate official reports, statistical forms, and export crime data in various formats"
+icon: "file-lines"
+---
+
+The Seguridad system provides comprehensive reporting capabilities for generating official documentation, statistical summaries, and data exports.
+
+## Overview
+
+The reporting module enables users to create structured reports, fill out statistical forms (planillas), and export data for analysis or official documentation.
+
+## Report Types
+
+### Incident Detail Reports
+
+Detailed reports showing individual crime incidents with complete information.
+
+<Card title="Preventivos Detail Report" icon="clipboard-list">
+  Generated via `preventivos_detalle.php`, this report displays:
+  
+  - Regional Unit (UR)
+  - Department (Dependencia)
+  - Incident description (Hechos)
+  - Location (Lugar)
+  - Date (Fecha)
+  - Complainant (Denunciante)
+  - Case status (Esclarecido)
+  
+  **Access Method**: Submit the crime query form with desired filters
+  
+  **Output**: Opens in a new window with formatted table results
+</Card>
+
+### Statistical Summary Reports
+
+<AccordionGroup>
+  <Accordion title="Daily Crime Reports">
+    Shows all crimes registered within a specific date range, organized by regional unit.
+    
+    **Features**:
+    - Province-wide or unit-specific reporting
+    - Date range filtering
+    - Organized by category
+    - Includes case clearance information
+    
+    **File**: `resultado_delito.php` (in dirgral folder)
+  </Accordion>
+
+  <Accordion title="Violence Against Women Reports">
+    Specialized reports for domestic violence and violence against women cases.
+    
+    **Query Parameters**:
+    - `d1`, `m1`, `a1`: Start date (day, month, year)
+    - `d2`, `m2`, `a2`: End date (day, month, year)
+    
+    **File**: `resultadoPlanillaViolenciaFamiliar.php`
+  </Accordion>
+
+  <Accordion title="Operations Reports">
+    Reports on police operations including:
+    - Roadblocks (Corte de Ruta)
+    - Patrols
+    - Special operations
+    - Control points
+    
+    **Files**: 
+    - `resultadoPlanillaCorteRuta.php`
+    - `resultado_estadistica_operativos.php`
+  </Accordion>
+</AccordionGroup>
+
+## Statistical Forms (Planillas)
+
+### Overview
+
+The `planillas.php` system provides structured forms for entering monthly crime statistics manually.
+
+### Form Structure
+
+<ParamField path="anio" type="text" required>
+  **Year**
+  
+  Four-digit year for the statistical period.
+</ParamField>
+
+<ParamField path="mes" type="select" required>
+  **Month**
+  
+  Select month from:
+  - ENERO (January)
+  - FEBRERO (February)
+  - MARZO (March)
+  - ABRIL (April)
+  - MAYO (May)
+  - JUNIO (June)
+  - JULIO (July)
+  - AGOSTO (August)
+  - SEPTIEMBRE (September)
+  - OCTUBRE (October)
+  - NOVIEMBRE (November)
+  - DICIEMBRE (December)
+</ParamField>
+
+<ParamField path="ur" type="select" required>
+  **Regional Unit**
+  
+  Select the regional unit for which statistics are being entered.
+</ParamField>
+
+### Crime Categories in Forms
+
+The statistical forms are organized into expandable sections (accordion panels) for each major crime category:
+
+<AccordionGroup>
+  <Accordion title="Delitos Contra la Propiedad (Property Crimes)">
+    14 distinct crime types including:
+    - Hurto (Theft)
+    - Robo (Robbery)
+    - Robo Calificado (Aggravated Robbery)
+    - Daño (Damage)
+    - Estafas (Fraud)
+    - Usurpación (Usurpation)
+    - Extorsión (Extortion)
+    
+    Each entry includes:
+    - Total incident count
+    - Number of cases solved (esclarecidos)
+  </Accordion>
+
+  <Accordion title="Delitos Contra las Personas (Crimes Against Persons)">
+    17 crime types including:
+    - Homicidios (Homicides) - various categories
+    - Lesiones (Injuries) - simple and with firearms
+    - Amenazas (Threats)
+    - Secuestro (Kidnapping)
+    - Suicidio (Suicide)
+    - Motochorro (Motorcycle robbery)
+  </Accordion>
+
+  <Accordion title="Delitos Contra la Integridad Sexual (Sexual Crimes)">
+    7 categories of sexual offenses:
+    - Abuso Sexual Simple (Simple Sexual Abuse)
+    - Abuso Sexual sin/con Acceso Carnal (With/without penetration)
+    - Corrupción de Menores (Corruption of Minors)
+    - Exhibiciones Obscenas (Indecent Exposure)
+  </Accordion>
+
+  <Accordion title="Additional Crime Categories">
+    - **Delitos Contra la Libertad** (7 types): Crimes against freedom
+    - **Delitos Contra la Administración Pública** (5 types): Crimes against public administration
+    - **Delitos Contra el Orden Público** (3 types): Crimes against public order
+    - **Delitos Contra la Seguridad Pública** (2 types): Crimes against public safety
+    - **Delitos Contra el Honor** (1 type): Crimes against honor
+    - **Delitos Contra el Estado Civil** (2 types): Crimes against civil status
+    - **Otros Delitos y Leyes Especiales** (5 types): Other crimes and special laws
+  </Accordion>
+</AccordionGroup>
+
+### Form Submission
+
+<Steps>
+  <Step title="Select Period">
+    Choose the year and month for which you're entering statistics.
+  </Step>
+  
+  <Step title="Select Unit">
+    Choose the regional unit.
+  </Step>
+  
+  <Step title="Enter Crime Data">
+    Expand each crime category section and enter:
+    - Total number of incidents (var1, var2, etc.)
+    - Number of solved cases (e1, e2, etc.)
+  </Step>
+  
+  <Step title="Submit Form">
+    Click "GUARDAR" (Save) to submit the statistical data.
+  </Step>
+</Steps>
+
+<Info>
+  Default values are set to "0" for all fields. Only update fields with actual data.
+</Info>
+
+## Data Export Formats
+
+### Available Export Options
+
+<CardGroup cols={2}>
+  <Card title="PDF Export" icon="file-pdf">
+    Generate official PDF reports with formatted tables and headers, suitable for printing and archival.
+  </Card>
+  
+  <Card title="Excel/CSV Export" icon="file-excel">
+    Export raw data to spreadsheet formats for further analysis, charting, or integration with other systems.
+  </Card>
+  
+  <Card title="Print View" icon="print">
+    Browser-optimized print layout for generating physical copies of reports.
+  </Card>
+  
+  <Card title="Screen Display" icon="display">
+    Interactive on-screen tables with sorting and filtering capabilities.
+  </Card>
+</CardGroup>
+
+## Report Generation Workflow
+
+<Steps>
+  <Step title="Navigate to Report Type">
+    Access the appropriate report module based on your needs:
+    - Crime statistics
+    - Operations reports
+    - Statistical forms
+    - Specialized reports (violence, traffic, etc.)
+  </Step>
+  
+  <Step title="Set Parameters">
+    Configure report parameters:
+    - Date ranges
+    - Geographic scope (units, departments)
+    - Crime types or categories
+    - Additional filters
+  </Step>
+  
+  <Step title="Generate Report">
+    Click the "BUSCAR" or "GUARDAR" button to generate the report or save data.
+  </Step>
+  
+  <Step title="Review Results">
+    Examine the generated report for accuracy and completeness.
+  </Step>
+  
+  <Step title="Export or Print">
+    Use export functions to save the report in your desired format, or print directly from the browser.
+  </Step>
+</Steps>
+
+## Specialized Reports
+
+### Traffic Accident Reports
+
+<Card title="Transit Reports" icon="car-burst">
+  Specialized reports for traffic accidents and violations.
+  
+  **Features**:
+  - Accident location mapping
+  - Vehicle information
+  - Injury/fatality tracking
+  - Date and time analysis
+  
+  **Access**: `resultado_transito.php`
+</Card>
+
+### Motorcycle-Related Crime Reports
+
+<Card title="Motocicleta Reports" icon="motorcycle">
+  Reports focusing on crimes involving motorcycles, including motorcycle theft and "motochorro" incidents.
+  
+  **Access**: `resultado_motocicleta.php`
+</Card>
+
+### Vehicle Search Reports
+
+<Card title="Vehicle Domain Search" icon="magnifying-glass">
+  Search and report on vehicles by license plate (domain).
+  
+  **Features**:
+  - License plate lookup
+  - Vehicle involvement in incidents
+  - Stolen vehicle database checks
+  
+  **Access**: `resultado_buscar_dominio.php`
+</Card>
+
+## Report Tables
+
+### Standard Report Format
+
+Most reports use a consistent table structure:
+
+| Column | Description |
+|--------|-------------|
+| UR | Regional Unit |
+| Dependencia | Police Department/Station |
+| Hechos | Incident Description |
+| Lugar | Location |
+| Fecha | Date |
+| Denunciante | Complainant/Reporter |
+| Esclarecido | Case Status (Solved/Unsolved) |
+
+### Report Headers
+
+Reports typically include:
+- Report title with date range
+- Geographic scope (province, unit, department)
+- Query parameters used
+- Generation timestamp
+
+## Data Validation
+
+<Warning>
+  **Important Validation Rules**:
+  
+  - Date ranges must be valid (start date before end date)
+  - Year fields must be 4 digits
+  - Month selections must be from the predefined list
+  - Unit and department selections must match database records
+  - Numeric fields in forms must contain valid numbers
+</Warning>
+
+## Database Integration
+
+Reports query and display data from key tables:
+
+- `delitos` - Main crime incidents
+- `operativos` - Police operations
+- `tipo_delito` - Crime type definitions
+- `ur` - Regional units
+- `dependencia` - Police departments
+- `estadistica_delictual` - Statistical summaries
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Regular Updates" icon="calendar-check">
+    Enter statistical form data regularly (monthly) to maintain accurate records.
+  </Card>
+  
+  <Card title="Data Verification" icon="check-double">
+    Review generated reports for accuracy before exporting or distributing.
+  </Card>
+  
+  <Card title="Backup Reports" icon="floppy-disk">
+    Export and save important reports in multiple formats for redundancy.
+  </Card>
+  
+  <Card title="Consistent Formatting" icon="align-justify">
+    Follow standard naming and formatting conventions for exported files.
+  </Card>
+</CardGroup>
+
+## Related Features
+
+<CardGroup cols={2}>
+  <Card title="Statistics" icon="chart-bar" href="/features/statistics">
+    Query and analyze crime statistics with flexible filtering
+  </Card>
+  
+  <Card title="Maps" icon="map" href="/features/maps">
+    Visualize crime data and operations geographically
+  </Card>
+</CardGroup>

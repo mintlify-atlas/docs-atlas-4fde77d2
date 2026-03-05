@@ -1,0 +1,562 @@
+---
+title: Getting Started
+description: Learn how to use the Seguridad police management system - from first login to managing incidents
+---
+
+## Overview
+
+This guide will help you get started with Seguridad, covering your first login, understanding the interface, and performing common tasks. Whether you're an administrator, regional unit operator, or consultation user, this guide will help you navigate the system effectively.
+
+## First Login
+
+<Steps>
+  <Step title="Access the Login Page">
+    Navigate to your Seguridad installation URL:
+    
+    ```
+    http://your-server-address/index.php
+    ```
+    
+    You'll see the Seguridad login screen with the system header and a login form.
+  </Step>
+  
+  <Step title="Enter Credentials">
+    Enter your username and password:
+    
+    - **Usuario (Username)**: Your assigned username
+    - **Contraseña (Password)**: Your assigned password
+    
+    <Note>
+      If this is your first login, use the credentials provided by your system administrator.
+    </Note>
+  </Step>
+  
+  <Step title="Click INGRESAR">
+    Click the **INGRESAR** (Login) button to access the system.
+    
+    <Warning>
+      Both username and password fields are required. You'll receive an alert if either field is empty.
+    </Warning>
+  </Step>
+  
+  <Step title="Automatic Redirect">
+    Upon successful login, you'll be automatically redirected to your assigned dashboard based on your permission level:
+    
+    - **Regional Units (UR 1-15)**: Unit-specific dashboard
+    - **Administrators**: Administrative control panel
+    - **Consultation Users**: Read-only query interface
+    - **Specialized Units**: Specific module dashboards
+  </Step>
+</Steps>
+
+## Understanding User Roles
+
+Your access level determines which features and data you can view or modify:
+
+<CardGroup cols={2}>
+  <Card title="Regional Unit Operators" icon="building-shield">
+    **Permissions: 1-15**
+    
+    Access to specific regional unit (UR) data:
+    - Register incidents and preventivos
+    - Manage regional cases
+    - Generate unit reports
+    - Access unit-specific records
+  </Card>
+  
+  <Card title="System Administrators" icon="user-shield">
+    **Permission: 0, 100**
+    
+    Full system access:
+    - Manage all users
+    - Configure system settings
+    - Access all regional data
+    - Generate system-wide reports
+  </Card>
+  
+  <Card title="Consultation Users" icon="magnifying-glass">
+    **Permissions: 20, 200**
+    
+    Read-only access:
+    - Query incident database
+    - View statistics
+    - Generate reports
+    - No data modification
+  </Card>
+  
+  <Card title="Specialized Units" icon="shield-halved">
+    **Various Codes**
+    
+    Specialized access:
+    - Federal crimes (4444)
+    - Traffic division (99)
+    - Operations (90, 803)
+    - Judicial access (21-28)
+  </Card>
+</CardGroup>
+
+## Navigating the Interface
+
+### Main Navigation Menu
+
+The system uses a horizontal menu bar with dropdown options. The menu structure includes:
+
+<Tabs>
+  <Tab title="CARGA DE DATOS">
+    **Data Entry Section** - Create new records:
+    
+    - **Preventivos**: Main incident reports
+    - **Maltrato Animal**: Animal abuse cases
+    - **Suicidios**: Suicide incidents
+    - **Accidente de Transito**: Traffic accidents
+    - **Fuga de Hogar**: Missing persons/runaways
+    - **Delitos Federales**: Federal crimes
+    - **Homicidio**: Homicide cases
+    - **Vehiculos Robados**: Stolen vehicles
+    - **Moto Chorros**: Motorcycle thefts
+    - **Parte Jefe de Turno**: Shift supervisor reports
+      - PARTE 07-19 (Day shift)
+      - PARTE 19-07 (Night shift)
+    - **Operativos**: Operations
+      - Standard operations
+      - Integral operations
+    - **Violencia Familiar**: Domestic violence
+    - **Usuarios**: User management
+    - **Herramientas**: System tools
+  </Tab>
+  
+  <Tab title="CONSULTA">
+    **Query Section** - Search and analyze data:
+    
+    - **Operativos**: Operations statistics and maps
+    - **Delitos**: Crime queries
+      - Historical data (2007-2012)
+      - Current data (2013+)
+      - By department
+      - Filtered searches
+    - **Maltrato Animal**: Animal abuse reports
+    - **Accidente de Transito**: Traffic accident details
+    - **Suicidios**: Suicide statistics and details
+    - **Homicidio**: Homicide statistics
+    - **Vehiculo Secuestrados**: Seized vehicles
+      - Search by license plate
+      - Statistics
+    - **Moto Chorro**: Motorcycle theft data
+    - **Delitos Federales**: Federal crime statistics
+    - **Buscar Preventivo**: Search incident reports
+    - **Preventivos por Año**: Incidents by year
+    - **Parte Jefe de Turno**: Shift reports
+    - **Mapa**: Geographic visualization
+  </Tab>
+  
+  <Tab title="Other Options">
+    **Additional Functions:**
+    
+    - **CONTROL DE CARGA DE PREV**: Incident loading control
+    - **SALIR**: Logout
+  </Tab>
+</Tabs>
+
+### Session Management
+
+The system maintains your session while you're active:
+
+- **Session Duration**: Sessions persist while you're active
+- **Inactivity Timeout**: Configurable (default: 10 minutes, may be disabled)
+- **Session Variables**: Username, password, and permission level stored
+- **Logout**: Always use the **SALIR** button to properly end your session
+
+<Note>
+  Your session information includes your username (`_usr`), permissions (`_categoria`), and last access time. This data determines what you can see and do in the system.
+</Note>
+
+## Common Tasks
+
+### Registering a New Incident (Preventivo)
+
+Preventivos are the primary incident reports in the system.
+
+<Steps>
+  <Step title="Navigate to Data Entry">
+    From the main menu:
+    1. Hover over **CARGA DE DATOS**
+    2. Click **Preventivos**
+  </Step>
+  
+  <Step title="Complete the Form">
+    Fill in all required incident details:
+    - Date and time of incident
+    - Location information
+    - Type of incident/crime
+    - Involved parties
+    - Description and observations
+    - Regional unit assignment
+  </Step>
+  
+  <Step title="Submit the Report">
+    Review your information and submit the form.
+    
+    <Tip>
+      Make sure all required fields are completed. The system will alert you if mandatory information is missing.
+    </Tip>
+  </Step>
+  
+  <Step title="Note the Preventivo Number">
+    After submission, note the generated preventivo number for future reference and tracking.
+  </Step>
+</Steps>
+
+### Searching for Existing Records
+
+<Tabs>
+  <Tab title="Search by Preventivo Number">
+    To find a specific incident report:
+    
+    1. Navigate to **CONSULTA** > **Buscar Preventivo**
+    2. Enter the preventivo number
+    3. Click search to view full details
+    4. Review incident information, status, and history
+    
+    <Info>
+      This search is available to all users with consultation privileges.
+    </Info>
+  </Tab>
+  
+  <Tab title="Search by Vehicle">
+    To search for vehicle-related incidents:
+    
+    1. Navigate to **CONSULTA** > **Vehiculo Secuestrados** > **BUSCAR VEHICULO**
+    2. Enter license plate (dominio) number
+    3. View vehicle history and related incidents
+    4. See seizure records and current status
+  </Tab>
+  
+  <Tab title="Date Range Queries">
+    To analyze data over a time period:
+    
+    1. Select the relevant category (e.g., **Accidente de Transito**)
+    2. Choose **Detalle entre fechas** or similar option
+    3. Select start and end dates
+    4. Generate report with detailed statistics
+  </Tab>
+</Tabs>
+
+### Viewing Statistics and Maps
+
+<Steps>
+  <Step title="Access Statistics">
+    Navigate to **CONSULTA** and select the category you want to analyze.
+    
+    Available statistical views:
+    - Crime statistics by type and region
+    - Traffic accident trends
+    - Operational efficiency metrics
+    - Regional comparisons
+  </Step>
+  
+  <Step title="View Geographic Data">
+    For spatial analysis:
+    
+    1. Go to **CONSULTA** > **Mapa**
+    2. View incident locations on interactive map
+    3. Filter by date range or incident type
+    4. Identify high-incident areas
+    
+    <Note>
+      Map features may be available based on your permission level.
+    </Note>
+  </Step>
+  
+  <Step title="Generate Reports">
+    Most query pages offer report generation:
+    - Select your filters and date ranges
+    - Click generate/view report
+    - Export data for further analysis (if available)
+  </Step>
+</Steps>
+
+### Managing Operations
+
+For users with operational permissions:
+
+<Steps>
+  <Step title="Register New Operation">
+    1. Navigate to **CARGA DE DATOS** > **Operativos**
+    2. Select operation type:
+       - Standard operation
+       - Integral operation (comprehensive)
+    3. Complete operation details:
+       - Date, time, and duration
+       - Participating units
+       - Operation objectives
+       - Location and scope
+  </Step>
+  
+  <Step title="Document Results">
+    During or after the operation:
+    - Record detentions and seizures
+    - Document evidence collected
+    - Link related preventivos
+    - Add observations and outcomes
+  </Step>
+  
+  <Step title="Review Operation Data">
+    To analyze operations:
+    1. Go to **CONSULTA** > **Operativos**
+    2. View **Estadísticas** for metrics
+    3. View **Mapa** for geographic distribution
+    4. Generate performance reports
+  </Step>
+</Steps>
+
+### Recording Specialized Incidents
+
+<AccordionGroup>
+  <Accordion title="Domestic Violence Cases">
+    Navigate to **CARGA DE DATOS** > **Violencia Familiar**
+    
+    Required information:
+    - Victim information and safety status
+    - Aggressor details
+    - Incident description and severity
+    - Protection measures taken
+    - Follow-up requirements
+    
+    <Warning>
+      Domestic violence cases require immediate attention and proper documentation for legal proceedings.
+    </Warning>
+  </Accordion>
+  
+  <Accordion title="Traffic Accidents">
+    Navigate to **CARGA DE DATOS** > **Accidente de Transito**
+    
+    Document:
+    - Location and time
+    - Vehicles involved
+    - Injuries and casualties
+    - Road conditions
+    - Contributing factors
+    - Insurance information
+  </Accordion>
+  
+  <Accordion title="Missing Persons">
+    Navigate to **CARGA DE DATOS** > **Fuga de Hogar**
+    
+    Critical information:
+    - Missing person description
+    - Last seen location and time
+    - Circumstances of disappearance
+    - Contact information for family
+    - Risk assessment
+  </Accordion>
+  
+  <Accordion title="Federal Crimes">
+    Navigate to **CARGA DE DATOS** > **Delitos Federales**
+    
+    Requires permission level **4444**
+    - Federal jurisdiction details
+    - Case number and classification
+    - Coordinating agencies
+    - Special handling procedures
+  </Accordion>
+</AccordionGroup>
+
+## Shift Supervisor Reports
+
+Shift supervisors must complete duty reports:
+
+### Day Shift (PARTE 07-19)
+
+1. Navigate to **CARGA DE DATOS** > **Parte Jefe de Turno** > **PARTE 07-19**
+2. Document shift activities (7:00 AM - 7:00 PM)
+3. Include:
+   - Personnel on duty
+   - Major incidents
+   - Resource allocation
+   - Issues or concerns
+
+### Night Shift (PARTE 19-07)
+
+1. Navigate to **CARGA DE DATOS** > **Parte Jefe de Turno** > **PARTE 19-07**
+2. Document shift activities (7:00 PM - 7:00 AM)
+3. Same information requirements as day shift
+
+<Tip>
+  Complete shift reports before the end of your shift to ensure accurate recordkeeping and smooth handover.
+</Tip>
+
+## User Management (Administrators)
+
+System administrators can manage users:
+
+<Steps>
+  <Step title="Access User Management">
+    Navigate to **CARGA DE DATOS** > **Usuarios**
+  </Step>
+  
+  <Step title="Create New User">
+    Provide:
+    - Username (usd)
+    - Password (pwd)
+    - Permission level (permisos)
+    - Additional user details
+    
+    <Warning>
+      Choose permission levels carefully. Refer to the [Installation Guide](/installation#user-permission-levels) for permission code reference.
+    </Warning>
+  </Step>
+  
+  <Step title="Assign Appropriate Permissions">
+    Set permissions based on user role:
+    - Regional unit operators: 1-15
+    - Consultation only: 20, 200
+    - Administrators: 0, 100
+    - Specialized units: Per unit requirements
+  </Step>
+</Steps>
+
+## Data Integrity Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Accurate Entry" icon="check-double">
+    - Verify all information before submission
+    - Use standardized formats for dates and times
+    - Include all required fields
+    - Double-check critical data (names, addresses, case numbers)
+  </Card>
+  
+  <Card title="Timely Reporting" icon="clock">
+    - Enter incidents as soon as possible
+    - Complete shift reports on time
+    - Update case status regularly
+    - Don't delay urgent incident registration
+  </Card>
+  
+  <Card title="Proper Classification" icon="tags">
+    - Use correct incident types
+    - Assign proper severity levels
+    - Link related incidents
+    - Follow department guidelines
+  </Card>
+  
+  <Card title="Documentation" icon="file-lines">
+    - Include detailed descriptions
+    - Attach relevant evidence references
+    - Note follow-up requirements
+    - Maintain clear audit trail
+  </Card>
+</CardGroup>
+
+## Troubleshooting Common Issues
+
+<AccordionGroup>
+  <Accordion title="Cannot access certain menu items">
+    **Cause**: Insufficient permissions for your role
+    
+    **Solution**:
+    - Verify your assigned permission level with your administrator
+    - Ensure you need access to the restricted functionality
+    - Request permission upgrade if necessary
+  </Accordion>
+  
+  <Accordion title="Session expired message">
+    **Cause**: Inactivity timeout or session expiration
+    
+    **Solution**:
+    - Log in again through the main page
+    - Save work frequently to prevent data loss
+    - Contact administrator to adjust timeout settings if needed
+  </Accordion>
+  
+  <Accordion title="Search returns no results">
+    **Cause**: Incorrect search criteria or no matching records
+    
+    **Solution**:
+    - Verify search terms (case numbers, dates, names)
+    - Expand date range if searching by time period
+    - Check if you have permission to view the data
+    - Try alternative search methods
+  </Accordion>
+  
+  <Accordion title="Form submission fails">
+    **Cause**: Missing required fields or validation errors
+    
+    **Solution**:
+    - Review all required fields (often marked with *)
+    - Check date format consistency
+    - Ensure numeric fields contain valid numbers
+    - Check for special characters in text fields
+  </Accordion>
+  
+  <Accordion title="'Not authenticated' error">
+    **Cause**: Session not established or expired
+    
+    **Solution**:
+    - Return to login page and log in again
+    - Clear browser cookies if issue persists
+    - Ensure cookies are enabled in your browser
+    - Try a different browser if problem continues
+  </Accordion>
+</AccordionGroup>
+
+## Security Best Practices
+
+<Warning>
+  **Critical Security Guidelines:**
+</Warning>
+
+- **Never share your credentials** with other users
+- **Change default passwords** immediately after first login
+- **Log out** when leaving your workstation
+- **Don't access the system** from public or untrusted computers
+- **Report suspicious activity** to your administrator immediately
+- **Use strong passwords** with letters, numbers, and symbols
+- **Don't write down passwords** in accessible locations
+
+## Getting Help
+
+If you encounter issues or need assistance:
+
+<Steps>
+  <Step title="Check Documentation">
+    Review the [Installation Guide](/installation) for system configuration details.
+  </Step>
+  
+  <Step title="Contact Your Administrator">
+    For permission issues, technical problems, or account questions, contact your system administrator.
+  </Step>
+  
+  <Step title="Report Bugs">
+    If you discover system errors or bugs, document:
+    - What you were trying to do
+    - Steps to reproduce the issue
+    - Any error messages displayed
+    - Your browser and operating system
+  </Step>
+</Steps>
+
+## Next Steps
+
+Now that you understand the basics:
+
+<CardGroup cols={2}>
+  <Card title="Explore Your Dashboard" icon="compass">
+    Familiarize yourself with the features available for your role
+  </Card>
+  
+  <Card title="Practice Data Entry" icon="keyboard">
+    Create test records to learn the system (if in training mode)
+  </Card>
+  
+  <Card title="Run Sample Queries" icon="chart-line">
+    Generate reports and statistics to understand data analysis features
+  </Card>
+  
+  <Card title="Review Reports" icon="file-chart-column">
+    Examine existing reports to learn documentation standards
+  </Card>
+</CardGroup>
+
+<Info>
+  **Training Available**: Contact your department training coordinator for hands-on sessions and role-specific instruction.
+</Info>

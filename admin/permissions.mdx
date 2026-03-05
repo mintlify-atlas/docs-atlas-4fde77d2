@@ -1,0 +1,486 @@
+---
+title: 'Permission System'
+description: 'Role-based access control and permission codes in the Seguridad platform'
+icon: 'shield-check'
+---
+
+## Overview
+
+The Seguridad system implements a role-based access control (RBAC) system using numeric and string-based permission codes. Each user is assigned a `categoria` (category) or `permisos` (permission) code that determines their access level and routing within the application.
+
+## Permission Architecture
+
+<CodeGroup>
+```php index.php - Authentication Flow
+// User login validation
+$sql = "select usd, pwd, permisos 
+        from usuario 
+        where usd='$user1' and pwd='$pass1'";
+$res = pg_exec($sql);
+$row = pg_fetch_row($res);
+
+$_SESSION["_usr"] = $row[0];
+$_SESSION["_pass"] = $row[1];
+$_SESSION["_categoria"] = $row[2];
+
+// Route based on permission code
+if (strcmp($row1[0], "0") == 0) {
+    // Redirect to admin index
+} else if (strcmp($row1[0], "1") == 0) {
+    // Redirect to UR1
+}
+// ... continued for all permission codes
+```
+</CodeGroup>
+
+## Permission Codes Reference
+
+### Administrative Permissions
+
+<ParamField path="0" type="permission">
+  **System Administrator**
+  
+  - Routes to: `index1.php` (main admin interface)
+  - Full system access
+  - Can manage all regional units
+</ParamField>
+
+<ParamField path="100" type="permission">
+  **Regional Administrator**
+  
+  - Routes to: `admin/cabecera1.php`
+  - Administrative panel access
+  - User management capabilities
+  - Regional oversight functions
+</ParamField>
+
+### Regional Unit Permissions (1-15)
+
+<Tabs>
+  <Tab title="UR 1-5">
+    <ResponseField name="1" type="permission">
+      **Unidad Regional 1**
+      
+      Routes to: `ur1/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="2" type="permission">
+      **Unidad Regional 2**
+      
+      Routes to: `ur2/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="3" type="permission">
+      **Unidad Regional 3**
+      
+      Routes to: `ur3/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="4" type="permission">
+      **Unidad Regional 4**
+      
+      Routes to: `ur4/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="5" type="permission">
+      **Unidad Regional 5**
+      
+      Routes to: `ur5/cabecera1.php`
+    </ResponseField>
+  </Tab>
+  
+  <Tab title="UR 6-10">
+    <ResponseField name="6" type="permission">
+      **Unidad Regional 6**
+      
+      Routes to: `ur6/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="7" type="permission">
+      **Unidad Regional 7**
+      
+      Routes to: `ur7/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="8" type="permission">
+      **Unidad Regional 8**
+      
+      Routes to: `ur8/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="9" type="permission">
+      **Unidad Regional 9**
+      
+      Routes to: `ur9/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="10" type="permission">
+      **Unidad Regional 10**
+      
+      Routes to: `ur10/cabecera1.php`
+    </ResponseField>
+  </Tab>
+  
+  <Tab title="UR 11-15">
+    <ResponseField name="11" type="permission">
+      **Unidad Regional 11**
+      
+      Routes to: `ur11/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="12" type="permission">
+      **Unidad Regional 12**
+      
+      Routes to: `ur12/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="13" type="permission">
+      **Unidad Regional 13**
+      
+      Routes to: `ur13/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="14" type="permission">
+      **Unidad Regional 14**
+      
+      Routes to: `ur14/cabecera1.php`
+    </ResponseField>
+    
+    <ResponseField name="15" type="permission">
+      **Unidad Regional 15**
+      
+      Routes to: `ur15/cabecera1.php`
+    </ResponseField>
+  </Tab>
+</Tabs>
+
+### Consultation Permissions
+
+<ParamField path="20" type="permission">
+  **General Consultation**
+  
+  - Routes to: `consulta/index1.php`
+  - Read-only access to records
+  - Query capabilities
+</ParamField>
+
+<ParamField path="200" type="permission">
+  **Extended Consultation**
+  
+  - Routes to: `consulta2/index1.php`
+  - Advanced query features
+</ParamField>
+
+### Judicial Permissions (21-28)
+
+<CardGroup cols={2}>
+  <Card title="Juzgado 1 - Code 21" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado1/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 2 - Code 22" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado2/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 3 - Code 23" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado3/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 4 - Code 24" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado4/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 5 - Code 25" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado5/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 6 - Code 26" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado6/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 7 - Code 27" icon="gavel">
+    Routes to: `primera_circuncripcion/juzgado7/menu_consulta.php`
+  </Card>
+  
+  <Card title="Juzgado 3 (Tercera) - Code 28" icon="gavel">
+    Routes to: `tercera_circuncripcion/juzgado3/menu_consulta.php`
+  </Card>
+</CardGroup>
+
+### Specialized Department Permissions (90-99)
+
+<Accordion title="Code 90 - Operations">
+  - Routes to: `operaciones/index1.php`
+  - Operational planning and coordination
+</Accordion>
+
+<Accordion title="Code 91 - Data Entry">
+  - Routes to: `carga_datos/index1.php`
+  - Bulk data loading capabilities
+</Accordion>
+
+<Accordion title="Code 92 - Subsecretariat">
+  - Routes to: `subsecretaria/index1.php`
+  - Administrative oversight
+</Accordion>
+
+<Accordion title="Code 93 - Toxicology">
+  - Routes to: `toxico/cabecera1.php`
+  - Drug-related case management
+</Accordion>
+
+<Accordion title="Code 94 - UNICEF">
+  - Routes to: `unicef/index1.php`
+  - Child protection cases
+</Accordion>
+
+<Accordion title="Code 95 - Missing Persons (Home)">
+  - Routes to: `fuga_hogar/index1.php`
+  - Runaway cases tracking
+</Accordion>
+
+<Accordion title="Code 96 - Dependent Resources">
+  - Routes to: `recursos_dependientes/index1.php`
+  - Resource management
+</Accordion>
+
+<Accordion title="Code 97 - Traffic Homicide">
+  - Routes to: `homicidio_accidente_transito/index1.php`
+  - Traffic accident fatalities
+</Accordion>
+
+<Accordion title="Code 98 - Suicide Cases">
+  - Routes to: `suicidio/index1.php`
+  - Suicide investigation records
+</Accordion>
+
+<Accordion title="Code 99 - Traffic Department">
+  - Routes to: `transito/index1.php`
+  - Traffic enforcement and violations
+</Accordion>
+
+### Query-Only Permissions (800-807)
+
+<CardGroup cols={2}>
+  <Card title="800 - Vehicle Search" icon="car">
+    Routes to: `buscar_dominio.php`
+  </Card>
+  
+  <Card title="801 - Prevention Search" icon="magnifying-glass">
+    Routes to: `buscarpreventivosoloconsultas.php`
+  </Card>
+  
+  <Card title="802 - Domestic Violence" icon="house-circle-exclamation">
+    Routes to: `operaciones/violencia_familiar.php`
+  </Card>
+  
+  <Card title="803 - Operations" icon="sitemap">
+    Routes to: `operativos/index.php`
+  </Card>
+  
+  <Card title="804 - Internal Affairs" icon="file-shield">
+    Routes to: `asuntos_i/cabecera1.php`
+  </Card>
+  
+  <Card title="805 - Road Safety" icon="road">
+    Routes to: `seguridad_vial/cabecera1.php`
+  </Card>
+  
+  <Card title="806 - Vehicle Verification" icon="car-circle-bolt">
+    Routes to: `verificacion_automotor/cabecera1.php`
+  </Card>
+  
+  <Card title="807 - Map Console" icon="map">
+    Routes to: `consultaMapa.php`
+  </Card>
+</CardGroup>
+
+### String-Based Permissions
+
+<ParamField path="Sub-jefe" type="string-permission">
+  **Deputy Chief**
+  
+  Routes to: `consulta_mapa_simple.php`
+</ParamField>
+
+<ParamField path="dirseguridad" type="string-permission">
+  **Security Director**
+  
+  Routes to: `dirgral/index1.php`
+</ParamField>
+
+<ParamField path="comisaria" type="string-permission">
+  **Police Station**
+  
+  Routes to: `comisarias/cabecera1.php`
+</ParamField>
+
+<ParamField path="operaciones" type="string-permission">
+  **Operations**
+  
+  Routes to: `operativos/` directory
+</ParamField>
+
+<ParamField path="4444" type="special-permission">
+  **Federal Crimes**
+  
+  Routes to: `delitos-federales/index1.php`
+</ParamField>
+
+<ParamField path="100000" type="test-permission">
+  **Testing Environment**
+  
+  Routes to: `prueba/cabecera1.php`
+</ParamField>
+
+## Access Control Implementation
+
+### Session-Based Validation
+
+<CodeGroup>
+```php miconexion.php
+@session_start();
+error_reporting(0);
+
+if (!isset($_SESSION["_usr"])) {
+    echo "Tu no estas autentificado - RESTRICCION TOTAL";
+    exit();
+}
+
+// Session timeout management
+$fechaGuardada = $_SESSION["ultimoAcceso"];
+$ahora = date("Y-n-j H:i:s");
+$_SESSION["ultimoAcceso"] = $ahora;
+
+$categoria = $_SESSION["_categoria"];
+```
+
+```php restriccion2.php
+if ($_SESSION["_categoria"] == 0 ||  
+    $_SESSION["_categoria"] == 1 || 
+    $_SESSION["_categoria"] == 2 || 
+    $_SESSION["_categoria"] == 3 || 
+    $_SESSION["_categoria"] == 4 || 
+    $_SESSION["_categoria"] == 5 || 
+    $_SESSION["_categoria"] == 6 || 
+    $_SESSION["_categoria"] == 10 || 
+    $_SESSION["_categoria"] == 20 || 
+    $_SESSION["_categoria"] == 21 || 
+    $_SESSION["_categoria"] == 22 || 
+    $_SESSION["_categoria"] == 23 || 
+    $_SESSION["_categoria"] == 24 || 
+    $_SESSION["_categoria"] == 25 || 
+    $_SESSION["_categoria"] == 26 || 
+    $_SESSION["_categoria"] == 100) {
+    // Access granted
+} else {
+    echo "RESTRICCION TOTAL - ingresa aqui";
+    exit();
+}
+```
+</CodeGroup>
+
+## Permission Assignment Workflow
+
+<Steps>
+  <Step title="User Creation">
+    Administrator creates user account with assigned permission code
+  </Step>
+  
+  <Step title="Authentication">
+    User logs in with credentials
+    
+    System validates against `usuario` table:
+    ```sql
+    SELECT usd, pwd, permisos 
+    FROM usuario 
+    WHERE usd='$username' AND pwd='$password'
+    ```
+  </Step>
+  
+  <Step title="Session Initialization">
+    Permission code stored in `$_SESSION["_categoria"]`
+  </Step>
+  
+  <Step title="Routing">
+    System redirects to appropriate interface based on permission code
+  </Step>
+  
+  <Step title="Access Validation">
+    Each protected page validates session and permission level
+  </Step>
+</Steps>
+
+## Security Considerations
+
+<Warning>
+  **Critical Security Issues**
+  
+  1. **Plain Text Passwords**: Database stores passwords without hashing
+  2. **SQL Injection**: Direct variable interpolation in queries
+  3. **Session Fixation**: No session regeneration on login
+  4. **Error Suppression**: `@` operator hides security errors
+</Warning>
+
+### Recommended Improvements
+
+<CodeGroup>
+```php Secure Password Handling
+// Use password hashing
+$hashed = password_hash($password, PASSWORD_ARGON2ID);
+
+// Verify on login
+if (password_verify($input_password, $hashed_from_db)) {
+    // Authenticate
+}
+```
+
+```php Parameterized Queries
+// Use prepared statements
+$stmt = pg_prepare($conn, "auth", 
+    "SELECT usd, pwd, permisos FROM usuario 
+     WHERE usd = $1 AND pwd = $2");
+$result = pg_execute($conn, "auth", [$username, $password]);
+```
+
+```php Session Security
+// Regenerate session ID on login
+session_regenerate_id(true);
+
+// Set secure session parameters
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.use_strict_mode', 1);
+```
+</CodeGroup>
+
+## Permission Matrix
+
+| Code | Type | Access Level | Primary Function |
+|------|------|--------------|------------------|
+| 0 | Admin | Full System | System Administration |
+| 1-15 | Regional | Unit-Specific | Regional Unit Operations |
+| 20-28 | Judicial | Read-Only | Case Consultation |
+| 90-99 | Specialized | Department | Specialized Functions |
+| 100 | Admin | Regional | Regional Administration |
+| 800-807 | Query | Limited Read | Specific Queries |
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="User Management" icon="users" href="/admin/user-management">
+    Create and manage user accounts
+  </Card>
+  
+  <Card title="Regional Units" icon="building" href="/admin/regional-units">
+    Regional organizational structure
+  </Card>
+  
+  <Card title="System Configuration" icon="gear" href="/admin/system-configuration">
+    Session and security settings
+  </Card>
+  
+  <Card title="Database Setup" icon="database" href="/admin/database-setup">
+    Configure authentication tables
+  </Card>
+</CardGroup>

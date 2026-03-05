@@ -1,0 +1,558 @@
+---
+title: Navigation
+description: Navigate the Seguridad system's modules and understand common workflows
+icon: compass
+---
+
+## Overview
+
+The Seguridad system provides a comprehensive navigation structure that organizes police operations data into logical modules. The main navigation menu adapts based on user roles and provides access to data entry, consultation, and management functions.
+
+## Main Menu Structure
+
+The primary navigation is implemented through a horizontal menu bar (`menu.php`) using the Spry Menu Bar framework. This menu is available to most users after authentication.
+
+<Info>
+  The navigation menu is included in most pages through `<?php include ('menu.php');?>` and provides consistent access to system features.
+</Info>
+
+## Navigation Modules
+
+### CARGA DE DATOS (Data Entry)
+
+The primary data entry module for recording incidents and cases:
+
+<AccordionGroup>
+  <Accordion title="Preventivos (Preventive Reports)">
+    **Path:** `alta_preventivos1.php`  
+    **Purpose:** Create and manage preventive police reports
+    
+    Main entry point for recording police interventions, investigations, and case initiation.
+  </Accordion>
+  
+  <Accordion title="Maltrato Animal (Animal Abuse)">
+    **Path:** `maltrato_animal_alta.php`  
+    **Purpose:** Document animal cruelty and abuse cases
+  </Accordion>
+  
+  <Accordion title="Suicidios (Suicides)">
+    **Path:** `Suicidios.php`  
+    **Purpose:** Record suicide cases and related investigations
+  </Accordion>
+  
+  <Accordion title="Accidente de Tránsito (Traffic Accidents)">
+    **Path:** `accidenteTransito.php`  
+    **Purpose:** Document traffic accidents and collisions
+  </Accordion>
+  
+  <Accordion title="Fuga de Hogar (Runaways)">
+    **Path:** `fuga_hogar.php`  
+    **Purpose:** Report missing persons and runaway cases
+  </Accordion>
+  
+  <Accordion title="Delitos Federales (Federal Crimes)">
+    **Path:** `delitos_federales.php`  
+    **Purpose:** Record federal-level criminal cases
+  </Accordion>
+  
+  <Accordion title="Homicidio (Homicide)">
+    **Path:** `homicidio.php`  
+    **Purpose:** Document homicide investigations
+  </Accordion>
+  
+  <Accordion title="Vehículos Robados (Stolen Vehicles)">
+    **Path:** `vehiculos_robados.php`  
+    **Purpose:** Report vehicle theft and disappearances
+  </Accordion>
+  
+  <Accordion title="Moto Chorros (Motorcycle Crimes)">
+    **Path:** `/seguridad/motochorros/alta_preventivos1.php`  
+    **Purpose:** Record crimes involving motorcycles
+  </Accordion>
+</AccordionGroup>
+
+### PARTE JEFE DE TURNO (Shift Chief Report)
+
+Shift supervisors record daily operational summaries:
+
+<CardGroup cols={2}>
+  <Card title="PARTE 07-19" icon="sun">
+    **Path:** `parte1.php`  
+    Day shift report (7 AM to 7 PM)
+  </Card>
+  
+  <Card title="PARTE 19-07" icon="moon">
+    **Path:** `parte2.php`  
+    Night shift report (7 PM to 7 AM)
+  </Card>
+</CardGroup>
+
+### Operativos (Operations)
+
+Planning and documentation of police operations:
+
+<Steps>
+  <Step title="Operativos Regulares">
+    **Path:** `registrar_operativo.php`  
+    Standard operational activities and interventions
+  </Step>
+  
+  <Step title="Operativos Integrales">
+    **Path:** `registrar_operativo_integral.php`  
+    Comprehensive multi-unit operations
+  </Step>
+</Steps>
+
+### Additional Entry Functions
+
+<CardGroup cols={2}>
+  <Card title="Violencia Familiar" icon="house-crack">
+    **Path:** `operaciones/violencia_familiar.php`  
+    Domestic violence case reporting
+  </Card>
+  
+  <Card title="Usuarios" icon="users">
+    **Path:** `alta_usuarios.php`  
+    User account management (admin only)
+  </Card>
+  
+  <Card title="Herramientas" icon="tools">
+    **Path:** `herramientas.php`  
+    System tools and utilities
+  </Card>
+</CardGroup>
+
+## CONSULTA (Query/Consultation Module)
+
+Comprehensive data query and reporting capabilities:
+
+### Operativos (Operations Queries)
+
+<Tabs>
+  <Tab title="Estadísticas">
+    **Path:** `consultaOperativos.php`  
+    **Features:**
+    - Operation statistics and summaries
+    - Date range filtering
+    - Unit-based reporting
+  </Tab>
+  
+  <Tab title="Mapa">
+    **Path:** `consultaMapaOperativos.php`  
+    **Features:**
+    - Geographic visualization of operations
+    - Interactive map interface
+    - Location-based analysis
+  </Tab>
+</Tabs>
+
+### Delitos (Crime Queries)
+
+<AccordionGroup>
+  <Accordion title="Delitos del 2007 al 2012">
+    **Path:** `consultaDelito_2007_2012.php`  
+    Historical crime data from 2007-2012 period
+  </Accordion>
+  
+  <Accordion title="Delitos mayor al 2013">
+    **Path:** `consultaDelito.php`  
+    Crime data from 2013 onwards with enhanced categorization
+  </Accordion>
+  
+  <Accordion title="Delitos por Departamentos">
+    **Path:** `consultaDelitoDepartamentosMisiones.php`  
+    Crime statistics by department/region in Misiones province
+  </Accordion>
+  
+  <Accordion title="Delitos mayor al 2013 FILTRADO">
+    **Path:** `consultaDelitoFiltrado.php`  
+    Advanced filtered crime queries with custom parameters
+  </Accordion>
+</AccordionGroup>
+
+### Specialized Case Queries
+
+<Tabs>
+  <Tab title="Maltrato Animal">
+    **Path:** `maltratoAnimalEntreFechas.php`  
+    Query animal abuse cases by date range
+  </Tab>
+  
+  <Tab title="Accidente de Tránsito">
+    **Path:** `consultaEntreFechas.php`  
+    Traffic accident victim details and statistics
+  </Tab>
+  
+  <Tab title="Suicidios">
+    **Path:** `consultaSuicidiosDetalle.php`  
+    Detailed suicide case information
+  </Tab>
+  
+  <Tab title="Homicidio">
+    **Paths:** 
+    - `consultaHomicidiosDetalle.php` - Victim details
+    - `consultaHomicidios.php` - Statistical analysis
+  </Tab>
+</Tabs>
+
+### Vehicle Queries
+
+<CardGroup cols={2}>
+  <Card title="Vehicle Details" icon="car">
+    **Path:** `consultaVehiculoDetalle.php`  
+    Detailed seized vehicle records
+  </Card>
+  
+  <Card title="Vehicle Statistics" icon="chart-bar">
+    **Path:** `consultaVehiculo.php`  
+    Statistical analysis of vehicle cases
+  </Card>
+  
+  <Card title="Vehicle Search" icon="magnifying-glass">
+    **Path:** `buscar_dominio.php`  
+    Search vehicles by license plate
+  </Card>
+</CardGroup>
+
+### Moto Chorro & Federal Crimes
+
+<Tabs>
+  <Tab title="Moto Chorro">
+    **Statistics:** `consultaMotochorroEstadistica.php`  
+    **Details:** `consultaMotochorroDetalle.php`  
+    Motorcycle-related crime analysis
+  </Tab>
+  
+  <Tab title="Delitos Federales">
+    **Statistics:** `consultaDelitosFederales.php`  
+    **Details:** `consultaDelitosFederalesDetalle.php`  
+    Federal crime case management
+  </Tab>
+</Tabs>
+
+### General Query Functions
+
+<CardGroup cols={2}>
+  <Card title="Mapa" icon="map">
+    **Path:** `consultaMapa.php`  
+    General geographic data visualization
+  </Card>
+  
+  <Card title="Buscar Preventivo" icon="search">
+    **Path:** `BuscarPreventivo.php`  
+    Search preventive reports by various criteria
+  </Card>
+  
+  <Card title="Preventivos por Año" icon="calendar">
+    **Path:** `consultaPreventivosAnio.php`  
+    Annual preventive report statistics
+  </Card>
+  
+  <Card title="Parte de Novedades" icon="clipboard">
+    **Consultation:** `consultaParte.php`  
+    **Statistics:** `consultaParteDetalle.php`  
+    Shift chief reports and summaries
+  </Card>
+</CardGroup>
+
+## CONTROL DE CARGA DE PREV
+
+<Card title="Load Control" icon="clipboard-check">
+  **Path:** `consultaControlCarga.php`  
+  **Purpose:** Monitor and verify preventive report data entry compliance
+  
+  Allows supervisors to track which units have completed required data entry and identify missing reports.
+</Card>
+
+## Search Functionality
+
+The system provides multiple search capabilities:
+
+<AccordionGroup>
+  <Accordion title="Preventive Report Search">
+    **Feature:** Search by report number, date, location, or keywords  
+    **Access:** `BuscarPreventivo.php`  
+    **Use Case:** Quickly locate specific preventive reports
+  </Accordion>
+  
+  <Accordion title="Vehicle Search">
+    **Feature:** Search by license plate (domain)  
+    **Access:** `buscar_dominio.php`  
+    **Use Case:** Check if a vehicle is reported stolen or seized
+  </Accordion>
+  
+  <Accordion title="Consultation Search">
+    **Feature:** Read-only search for judicial personnel  
+    **Access:** `buscarpreventivosoloconsultas.php`  
+    **Use Case:** Court officials reviewing case information
+  </Accordion>
+</AccordionGroup>
+
+## Common Workflows
+
+### Workflow 1: Recording a New Incident
+
+<Steps>
+  <Step title="Login to System">
+    Authenticate with your credentials at `index.php`
+  </Step>
+  
+  <Step title="Navigate to CARGA DE DATOS">
+    Click on **CARGA DE DATOS** in the main menu
+  </Step>
+  
+  <Step title="Select Incident Type">
+    Choose the appropriate entry form:
+    - **Preventivos** for general cases
+    - Specialized forms for specific incident types
+  </Step>
+  
+  <Step title="Complete Entry Form">
+    Fill in all required fields:
+    - Date and time
+    - Location
+    - Incident details
+    - Involved parties
+    - Evidence and observations
+  </Step>
+  
+  <Step title="Submit and Verify">
+    Save the record and note the generated report number for future reference
+  </Step>
+</Steps>
+
+### Workflow 2: Querying Incident Data
+
+<Steps>
+  <Step title="Access CONSULTA Module">
+    Click **CONSULTA** in the main navigation
+  </Step>
+  
+  <Step title="Select Query Type">
+    Choose from:
+    - **Delitos** for crime statistics
+    - **Mapa** for geographic visualization
+    - **Buscar Preventivo** for specific report lookup
+  </Step>
+  
+  <Step title="Set Query Parameters">
+    Configure filters:
+    - Date range
+    - Location/jurisdiction
+    - Incident type
+    - Additional criteria
+  </Step>
+  
+  <Step title="Execute Query">
+    Submit the query and review results
+  </Step>
+  
+  <Step title="Export or Print">
+    Generate reports or export data as needed
+  </Step>
+</Steps>
+
+### Workflow 3: Managing Operations
+
+<Steps>
+  <Step title="Plan Operation">
+    Navigate to **CARGA DE DATOS** > **Operativos**
+  </Step>
+  
+  <Step title="Select Operation Type">
+    - **Operativos** for standard operations
+    - **Operativos Integrales** for multi-unit operations
+  </Step>
+  
+  <Step title="Register Operation Details">
+    Document:
+    - Operation name and objective
+    - Participating units
+    - Date/time and location
+    - Resources allocated
+  </Step>
+  
+  <Step title="Execute and Update">
+    Record operation progress and results in real-time
+  </Step>
+  
+  <Step title="Review Results">
+    Access **CONSULTA** > **Operativos** for statistical analysis and mapping
+  </Step>
+</Steps>
+
+### Workflow 4: Shift Chief Reporting
+
+<Steps>
+  <Step title="Determine Shift Period">
+    - **07-19** for day shift
+    - **19-07** for night shift
+  </Step>
+  
+  <Step title="Access Parte Form">
+    Navigate to **CARGA DE DATOS** > **PARTE JEFE DE TURNO**
+  </Step>
+  
+  <Step title="Complete Shift Summary">
+    Document:
+    - Notable incidents
+    - Personnel status
+    - Resource availability
+    - Operational highlights
+  </Step>
+  
+  <Step title="Submit Report">
+    Save the shift report for supervisor review
+  </Step>
+  
+  <Step title="Review Historical Reports">
+    Access **CONSULTA** > **Parte Jefe de Turno** to view past reports
+  </Step>
+</Steps>
+
+## Map Visualizations
+
+The system provides several geographic visualization tools:
+
+<CardGroup cols={2}>
+  <Card title="General Map" icon="map-location-dot">
+    **Path:** `consultaMapa.php`  
+    Displays incidents and operations on an interactive map
+  </Card>
+  
+  <Card title="Operations Map" icon="radar">
+    **Path:** `consultaMapaOperativos.php`  
+    Specialized map for operational planning and analysis
+  </Card>
+  
+  <Card title="Simple Map (Deputy Chief)" icon="map-marked">
+    **Path:** `consulta_mapa_simple.php`  
+    Simplified map interface for supervisory overview
+  </Card>
+</CardGroup>
+
+<Info>
+  Map features may include:
+  - Incident clustering by location
+  - Heat maps for crime density
+  - Filtering by date range and incident type
+  - Export to image or PDF
+</Info>
+
+## Navigation Tips
+
+<Tabs>
+  <Tab title="Keyboard Shortcuts">
+    While specific keyboard shortcuts aren't documented in the source code, standard browser shortcuts apply:
+    
+    - **Tab** - Navigate between form fields
+    - **Enter** - Submit forms (when in input fields)
+    - **Esc** - Close modal dialogs
+    - **Ctrl+F** - Search within page
+  </Tab>
+  
+  <Tab title="Browser Compatibility">
+    The system is designed for:
+    - Modern browsers with JavaScript enabled
+    - Spry framework support (Adobe Spry MenuBar)
+    - CSS3 and HTML5 compatibility
+    
+    <Warning>
+      For best results, use updated versions of Chrome, Firefox, or Edge.
+    </Warning>
+  </Tab>
+  
+  <Tab title="Performance Tips">
+    - Use specific date ranges in queries to improve performance
+    - Bookmark frequently accessed pages
+    - Clear browser cache if experiencing issues
+    - Limit map visualizations to relevant data ranges
+  </Tab>
+</Tabs>
+
+## Module Access by Role
+
+Different roles have access to different menu sections:
+
+| Menu Section | Admin (0) | Regional Units (1-15) | Judicial (20-28) | Specialized (90-99) |
+|--------------|-----------|----------------------|------------------|--------------------|
+| **CARGA DE DATOS** | ✓ | ✓ | ✗ | ✓ (limited) |
+| **CONSULTA** | ✓ | ✓ | ✓ | ✓ |
+| **Operativos Entry** | ✓ | ✓ | ✗ | ✓ (some units) |
+| **Usuarios** | ✓ | ✗ | ✗ | ✗ |
+| **CONTROL DE CARGA** | ✓ | ✓ | ✗ | ✗ |
+
+<Note>
+  Access permissions are determined by the user's role code. See the [User Roles Guide](/guides/user-roles) for detailed permission mappings.
+</Note>
+
+## Logout
+
+To end your session:
+
+<Card title="SALIR (Exit)" icon="right-from-bracket">
+  **Path:** `logout.php`  
+  **Location:** Top navigation bar (far right)
+  
+  Safely ends your session and returns you to the login page.
+</Card>
+
+<Warning>
+  Always logout when finished to protect sensitive law enforcement data.
+</Warning>
+
+## Mobile Access
+
+<Info>
+  The current system design is optimized for desktop browsers. Mobile access may result in:
+  - Reduced functionality
+  - Layout issues
+  - Menu navigation challenges
+  
+  For critical operations, desktop access is recommended.
+</Info>
+
+## Troubleshooting Navigation
+
+<AccordionGroup>
+  <Accordion title="Menu Not Displaying">
+    **Symptoms:** Navigation menu is blank or not visible
+    
+    **Solutions:**
+    - Verify JavaScript is enabled
+    - Check that SpryAssets are loading correctly
+    - Clear browser cache and reload
+    - Ensure you're authenticated (session valid)
+  </Accordion>
+  
+  <Accordion title="Missing Menu Options">
+    **Symptoms:** Some menu items don't appear
+    
+    **Solutions:**
+    - Verify your user role has access to those modules
+    - Contact administrator to confirm permissions
+    - Check if you're in the correct landing page for your role
+  </Accordion>
+  
+  <Accordion title="Page Not Loading After Menu Click">
+    **Symptoms:** Clicking menu items results in errors
+    
+    **Solutions:**
+    - Check session hasn't expired (look for authentication errors)
+    - Verify file paths exist on server
+    - Review browser console for JavaScript errors
+    - Contact system administrator if persistent
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/guides/authentication">
+    Understand login and session management
+  </Card>
+  
+  <Card title="User Roles" icon="users" href="/guides/user-roles">
+    Learn about different user roles and permissions
+  </Card>
+</CardGroup>

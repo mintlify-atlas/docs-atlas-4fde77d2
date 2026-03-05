@@ -1,0 +1,293 @@
+---
+title: 'User Management'
+description: 'Manage system users, roles, and permissions in the Seguridad platform'
+icon: 'users'
+---
+
+## Overview
+
+The Seguridad system provides comprehensive user management capabilities through the `alta_usuarios.php` interface. Administrators can create, modify, and manage user accounts with role-based access control.
+
+## Adding New Users
+
+<Steps>
+  <Step title="Access User Management">
+    Navigate to the user management interface at `alta_usuarios.php` (requires administrative permissions - Category 100)
+  </Step>
+  
+  <Step title="Fill User Information">
+    Complete the following required fields:
+    
+    <ParamField path="id" type="string" required>
+      Username (lowercase, max 16 characters)
+    </ParamField>
+    
+    <ParamField path="clave" type="password" required>
+      User password (max 16 characters)
+    </ParamField>
+    
+    <ParamField path="confirma" type="password" required>
+      Password confirmation (must match)
+    </ParamField>
+    
+    <ParamField path="iniciales" type="string">
+      User description or full name (max 50 characters)
+    </ParamField>
+    
+    <ParamField path="dependencia" type="select" required>
+      Circunscripción (department/jurisdiction)
+    </ParamField>
+    
+    <ParamField path="categoria" type="string" required>
+      Permission category/role code
+    </ParamField>
+  </Step>
+  
+  <Step title="Optional Fields">
+    <ParamField path="telefono" type="string">
+      Contact phone number(s)
+    </ParamField>
+    
+    <ParamField path="email" type="string">
+      Email address
+    </ParamField>
+    
+    <ParamField path="fecha_fuera_periodo" type="date">
+      Authorized loading date (format: dd-mm-yyyy)
+      
+      Users cannot load data before this date
+    </ParamField>
+  </Step>
+  
+  <Step title="Save User">
+    Click **Guardar** (Save) to create the user account
+    
+    The system validates:
+    - Username uniqueness
+    - Password matching
+    - Required field completion
+  </Step>
+</Steps>
+
+<Note>
+  The system checks for duplicate usernames in the `hs_pswod` table before creating new accounts.
+</Note>
+
+## Database Schema
+
+User information is stored in the `hs_pswod` table:
+
+```sql
+INSERT INTO hs_pswod (
+  usuario,      -- Username
+  pass,         -- Password (stored as plain text)
+  categoria,    -- Permission category
+  iniciales,    -- Description
+  grupo,        -- Group
+  dependencia,  -- Department
+  autorizado,   -- Authorization flag
+  telefono,     -- Phone
+  email,        -- Email
+  sistema       -- System identifier (default: 'horas_laborales')
+) VALUES (...);
+```
+
+<Warning>
+  **Security Notice**: The current implementation stores passwords in plain text. This is a security vulnerability that should be addressed by implementing password hashing (bcrypt, Argon2, etc.).
+</Warning>
+
+## Modifying Users
+
+<Steps>
+  <Step title="Select User">
+    From the user list, click **Modificar** next to the username
+  </Step>
+  
+  <Step title="Update Information">
+    Modify any of the user fields as needed
+    
+    <Info>
+      The username (`id`) cannot be changed once created
+    </Info>
+  </Step>
+  
+  <Step title="Save Changes">
+    Click **Modificar** button to update the user record
+  </Step>
+</Steps>
+
+### Modification Query
+
+```sql
+UPDATE hs_pswod 
+SET  
+  pass = '$clave', 
+  categoria = $categoria, 
+  iniciales = '$iniciales', 
+  grupo = '$grupo', 
+  dependencia = '$dependencia', 
+  autorizado = $autorizado, 
+  telefono = '$telefono', 
+  email = '$email'
+WHERE usuario = '$id'
+```
+
+## Bulk Operations
+
+### Disable Loading for All Users
+
+Administrators can prevent all non-admin users from loading data before a specified date:
+
+<Steps>
+  <Step title="Set Date">
+    Enter date in format `dd-mm-yyyy` (e.g., 01-01-2026)
+  </Step>
+  
+  <Step title="Apply Restriction">
+    Click **Inhabilitar CFP a TODOS** (Disable CFP for All)
+    
+    This updates all users with `permisos <> 0` (non-system users)
+  </Step>
+</Steps>
+
+```sql
+UPDATE usuario
+SET autorizado = '$fecha_fuera_periodo_todos'
+WHERE permisos <> 0
+```
+
+## User List View
+
+The system displays all users with the following information:
+
+```
+Usuario > Permisos > Circunscripcion > Nota > Fecha de Carga Autorizada
+```
+
+### Sorting
+
+Users are sorted by:
+1. `autorizado_carga_fuera_periodo` (authorized loading date)
+2. `usd` (username) in ascending order
+
+## Access Control
+
+User management requires administrative access:
+
+<CodeGroup>
+```php restriccion2.php
+if ($_SESSION["_categoria"] == 0 ||  
+    $_SESSION["_categoria"] == 1 || 
+    $_SESSION["_categoria"] == 2 || 
+    // ... other allowed categories
+    $_SESSION["_categoria"] == 100)
+{
+    // Access granted
+} else {
+    // Access denied - redirect
+}
+```
+</CodeGroup>
+
+## Client-Side Validation
+
+The form includes JavaScript validation:
+
+```javascript
+function Valida(formulario) {
+  if (formulario.usuario.value == '') {
+    alert("campo usuario vacio");
+    return false;
+  }
+  
+  if (document.formulario.clave.value != 
+      document.formulario.confirma.value) {
+    alert("No coincide el Campo Clave con el Campo Confirmar Clave");
+    return false;
+  }
+}
+```
+
+## Best Practices
+
+<AccordionGroup>
+  <Accordion title="Username Convention">
+    - Use lowercase characters only
+    - Keep usernames concise (max 16 chars)
+    - Use meaningful identifiers (e.g., department codes)
+  </Accordion>
+  
+  <Accordion title="Password Policy">
+    <Warning>
+      The system does not enforce password complexity. Consider implementing:
+      - Minimum length requirements
+      - Character diversity (uppercase, numbers, symbols)
+      - Password hashing before storage
+    </Warning>
+  </Accordion>
+  
+  <Accordion title="Role Assignment">
+    - Assign the minimum required permission level
+    - Document role assignments for audit purposes
+    - Review user permissions regularly
+    - See [Permissions](/admin/permissions) for role codes
+  </Accordion>
+  
+  <Accordion title="Data Integrity">
+    - Verify department assignments match organizational structure
+    - Keep contact information up to date
+    - Set appropriate authorized loading dates
+  </Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="Permissions" icon="shield-check" href="/admin/permissions">
+    Learn about role codes and access control
+  </Card>
+  
+  <Card title="Regional Units" icon="building" href="/admin/regional-units">
+    Understand departmental structure
+  </Card>
+  
+  <Card title="Database Setup" icon="database" href="/admin/database-setup">
+    Configure PostgreSQL and schema
+  </Card>
+  
+  <Card title="System Configuration" icon="gear" href="/admin/system-configuration">
+    PHP and web server settings
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="User Already Exists">
+    ```
+    Ya existe un usuario con esa cuenta
+    ```
+    
+    **Solution**: Choose a different username or modify the existing user
+  </Accordion>
+  
+  <Accordion title="Password Mismatch">
+    ```
+    No coincide el campo Clave con el campo Confirma
+    ```
+    
+    **Solution**: Ensure both password fields match exactly
+  </Accordion>
+  
+  <Accordion title="Database Insert Error">
+    ```
+    Error al insertar el usuario en la base de datos local
+    ```
+    
+    **Solution**: Check:
+    - Database connection is active
+    - Table `hs_pswod` exists
+    - User has INSERT permissions
+    - Required fields are not NULL
+  </Accordion>
+</AccordionGroup>

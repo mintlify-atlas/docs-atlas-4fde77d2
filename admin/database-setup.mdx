@@ -1,0 +1,759 @@
+---
+title: 'Database Setup'
+description: 'PostgreSQL installation, schema configuration, and database management for Seguridad'
+icon: 'database'
+---
+
+## Overview
+
+The Seguridad system uses PostgreSQL as its database management system. This guide covers installation, schema creation, connection configuration, and maintenance procedures.
+
+## PostgreSQL Installation
+
+### System Requirements
+
+<CardGroup cols={2}>
+  <Card title="PostgreSQL Version" icon="p">
+    Version 9.x or higher recommended
+  </Card>
+  
+  <Card title="Default Port" icon="network-wired">
+    Port 5434 (custom, not standard 5432)
+  </Card>
+  
+  <Card title="Host" icon="server">
+    localhost (for single-server setup)
+  </Card>
+  
+  <Card title="User" icon="user">
+    postgres (default superuser)
+  </Card>
+</CardGroup>
+
+### Installation Steps
+
+<Tabs>
+  <Tab title="Linux">
+    <Steps>
+      <Step title="Install PostgreSQL">
+        ```bash
+        # Ubuntu/Debian
+        sudo apt update
+        sudo apt install postgresql postgresql-contrib
+        
+        # CentOS/RHEL
+        sudo yum install postgresql-server postgresql-contrib
+        sudo postgresql-setup initdb
+        ```
+      </Step>
+      
+      <Step title="Configure Custom Port">
+        Edit `/etc/postgresql/[version]/main/postgresql.conf`:
+        
+        ```ini
+        port = 5434
+        ```
+      </Step>
+      
+      <Step title="Start Service">
+        ```bash
+        sudo systemctl start postgresql
+        sudo systemctl enable postgresql
+        ```
+      </Step>
+      
+      <Step title="Verify Installation">
+        ```bash
+        psql --version
+        sudo -u postgres psql -p 5434
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+  
+  <Tab title="Windows">
+    <Steps>
+      <Step title="Download Installer">
+        Download from [postgresql.org](https://www.postgresql.org/download/windows/)
+      </Step>
+      
+      <Step title="Run Installer">
+        - Choose installation directory
+        - Set port to **5434**
+        - Set password for postgres user
+        - Select components (server, pgAdmin, command line tools)
+      </Step>
+      
+      <Step title="Verify Installation">
+        Open Command Prompt:
+        ```cmd
+        psql --version
+        psql -U postgres -p 5434
+        ```
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Warning>
+  The system is configured to use **port 5434** instead of PostgreSQL's default port 5432. Ensure your installation matches this configuration.
+</Warning>
+
+## Database Connection Configuration
+
+### Connection File
+
+The system uses `miconexion.php` for database connectivity:
+
+<CodeGroup>
+```php miconexion.php
+<?php 
+@session_start(); 
+error_reporting(0);
+
+if (!isset($_SESSION["_usr"])) {
+    echo "Tu no estas autentificado";
+    exit();
+} else {
+    // Session management
+    $fechaGuardada = $_SESSION["ultimoAcceso"];
+    $ahora = date("Y-n-j H:i:s");
+    $_SESSION["ultimoAcceso"] = $ahora;
+    
+    // Database connection parameters
+    $host = 'localhost';
+    $dbname = '';  // Set your database name
+    $puerto = '5434';
+    $user1 = $_SESSION["_usr"];
+    $pass1 = $_SESSION["_pass"];
+    $categoria = $_SESSION["_categoria"];
+    
+    global $con;
+    $con = pg_connect(
+        "host=$host port=$puerto " .
+        "user='postgres' password=' ' " .
+        "dbname=$dbname"
+    );
+}
+?>
+```
+
+```php index.php - Initial Connection
+$host = 'localhost';
+$dbname = '';  // Database name
+$puerto = '5434';
+
+$con = pg_connect(
+    "host=$host port=$puerto " .
+    "user='postgres' password=' ' " .
+    "dbname=$dbname"
+);
+
+if ($con) {
+    $_SESSION["ultimoAcceso"] = date("Y-n-j H:i:s");
+    $_SESSION["autentificado"] = "SI";
+}
+```
+</CodeGroup>
+
+### Configuration Parameters
+
+<ParamField path="host" type="string" default="localhost">
+  Database server hostname
+  
+  - Use `localhost` for local installation
+  - Use IP address or hostname for remote servers
+</ParamField>
+
+<ParamField path="puerto" type="integer" default="5434" required>
+  PostgreSQL port number
+  
+  **Must be 5434** to match system configuration
+</ParamField>
+
+<ParamField path="dbname" type="string" required>
+  Database name
+  
+  Set this to your Seguridad database name (e.g., `seguridad_db`, `misiones_seguridad`)
+</ParamField>
+
+<ParamField path="user" type="string" default="postgres">
+  Database username
+  
+  Default: `postgres` (superuser)
+</ParamField>
+
+<ParamField path="password" type="string" required>
+  Database password
+  
+  <Warning>
+    Currently stored in plain text - implement secure credential management
+  </Warning>
+</ParamField>
+
+## Database Schema
+
+### Core Tables
+
+<Tabs>
+  <Tab title="Users & Authentication">
+    <Accordion title="usuario / hs_pswod Table">
+      User accounts and authentication:
+      
+      ```sql
+      CREATE TABLE usuario (
+          usd VARCHAR(16) PRIMARY KEY,      -- Username
+          pwd VARCHAR(16) NOT NULL,         -- Password (plain text)
+          permisos VARCHAR(20) NOT NULL,    -- Permission code
+          circunscripcion VARCHAR(50),      -- Jurisdiction
+          nota TEXT,                        -- Notes
+          cod VARCHAR(10),                  -- Code
+          autorizado_carga_fuera_periodo DATE  -- Authorized load date
+      );
+      
+      -- Alternate table name used in some modules
+      CREATE TABLE hs_pswod (
+          usuario VARCHAR(16) PRIMARY KEY,
+          pass VARCHAR(16) NOT NULL,
+          categoria VARCHAR(20) NOT NULL,   -- Permission category
+          iniciales VARCHAR(50),            -- Full name/description
+          grupo VARCHAR(50),                -- Group
+          dependencia VARCHAR(100),         -- Department
+          autorizado INTEGER,               -- Authorization flag
+          telefono VARCHAR(500),            -- Phone number(s)
+          email VARCHAR(500),               -- Email address
+          sistema VARCHAR(50) DEFAULT 'horas_laborales'
+      );
+      
+      CREATE INDEX idx_usuario_categoria ON usuario(permisos);
+      CREATE INDEX idx_usuario_circunscripcion ON usuario(circunscripcion);
+      ```
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Organizational Structure">
+    <Accordion title="dependencias Table">
+      Departments and regional units:
+      
+      ```sql
+      CREATE TABLE dependencias (
+          id_dependencia SERIAL PRIMARY KEY,
+          dependencia VARCHAR(100) NOT NULL,  -- Department name
+          relacion INTEGER,                   -- Regional unit (1-15)
+          direccion VARCHAR(100),             -- Address/Direction
+          localidad VARCHAR(100),             -- Location/Municipality
+          id_direcciones INTEGER              -- Parent direction ID
+      );
+      
+      CREATE INDEX idx_dep_relacion ON dependencias(relacion);
+      CREATE INDEX idx_dep_localidad ON dependencias(localidad);
+      
+      -- Sample data for UR 1
+      INSERT INTO dependencias 
+        (dependencia, relacion, direccion, localidad) 
+      VALUES 
+        ('COMISARIA 1RA', 1, 'UR1', 'POSADAS'),
+        ('COMISARIA 2DA', 1, 'UR1', 'POSADAS'),
+        ('COMISARIA 3RA', 1, 'UR1', 'GARUPÁ');
+      ```
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Case Records">
+    <Accordion title="preventivos Table">
+      Prevention cases and incidents:
+      
+      ```sql
+      CREATE TABLE preventivos (
+          id SERIAL PRIMARY KEY,
+          nro_preventivo VARCHAR(50) NOT NULL,
+          fecha DATE NOT NULL,
+          hora TIME,
+          dependencia VARCHAR(100),
+          delito VARCHAR(200),              -- Crime type
+          lugar VARCHAR(500),               -- Location
+          victima VARCHAR(200),             -- Victim
+          denunciante VARCHAR(200),         -- Reporter
+          imputado VARCHAR(200),            -- Accused
+          detenido BOOLEAN DEFAULT FALSE,   -- Detained
+          fiscal VARCHAR(100),              -- Prosecutor
+          juzgado VARCHAR(100),             -- Court
+          observaciones TEXT,               -- Notes
+          latitud DECIMAL(10, 8),          -- Latitude
+          longitud DECIMAL(11, 8),         -- Longitude
+          usuario_carga VARCHAR(16),        -- User who loaded
+          fecha_carga TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          FOREIGN KEY (dependencia) 
+              REFERENCES dependencias(dependencia),
+          FOREIGN KEY (usuario_carga) 
+              REFERENCES usuario(usd)
+      );
+      
+      CREATE INDEX idx_prev_fecha ON preventivos(fecha);
+      CREATE INDEX idx_prev_dependencia ON preventivos(dependencia);
+      CREATE INDEX idx_prev_delito ON preventivos(delito);
+      ```
+    </Accordion>
+  </Tab>
+  
+  <Tab title="Operations">
+    <Accordion title="operativos Table">
+      Operational activities:
+      
+      ```sql
+      CREATE TABLE operativos (
+          id SERIAL PRIMARY KEY,
+          tipo_operativo VARCHAR(100),      -- Operation type
+          fecha_inicio DATE,
+          fecha_fin DATE,
+          dependencias_participantes TEXT,   -- JSON or CSV
+          descripcion TEXT,
+          resultados TEXT,
+          personal_asignado INTEGER,
+          recursos_utilizados TEXT,
+          estado VARCHAR(50),               -- Status
+          usuario_registro VARCHAR(16),
+          fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+      
+      CREATE INDEX idx_oper_fecha ON operativos(fecha_inicio);
+      CREATE INDEX idx_oper_estado ON operativos(estado);
+      ```
+    </Accordion>
+  </Tab>
+</Tabs>
+
+### Additional Tables
+
+<AccordionGroup>
+  <Accordion title="misiones - Geographic Data">
+    Municipality and geographic information:
+    
+    ```sql
+    CREATE TABLE misiones (
+        municipio VARCHAR(100) PRIMARY KEY,
+        departamento VARCHAR(100),
+        region VARCHAR(50),
+        poblacion INTEGER,
+        superficie DECIMAL(10, 2)
+    );
+    ```
+  </Accordion>
+  
+  <Accordion title="delitos - Crime Classifications">
+    Crime type catalog:
+    
+    ```sql
+    CREATE TABLE delitos (
+        id SERIAL PRIMARY KEY,
+        codigo VARCHAR(20) UNIQUE,
+        descripcion VARCHAR(200) NOT NULL,
+        categoria VARCHAR(100),
+        gravedad VARCHAR(50)
+    );
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Initial Setup Script
+
+Create the database and initial schema:
+
+<CodeGroup>
+```sql setup.sql
+-- Create database
+CREATE DATABASE seguridad_db
+    WITH 
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'es_AR.UTF-8'
+    LC_CTYPE = 'es_AR.UTF-8'
+    TEMPLATE = template0;
+
+-- Connect to database
+\c seguridad_db
+
+-- Create schema (use SQL from "Database Schema" section above)
+
+-- Create initial admin user
+INSERT INTO usuario (usd, pwd, permisos) 
+VALUES ('admin', 'admin123', '0');
+
+-- Grant permissions
+GRANT ALL PRIVILEGES ON DATABASE seguridad_db TO postgres;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO postgres;
+```
+
+```bash Execute Setup
+# Run as postgres user
+psql -U postgres -p 5434 -f setup.sql
+
+# Verify tables created
+psql -U postgres -p 5434 -d seguridad_db -c "\dt"
+```
+</CodeGroup>
+
+## PHP PostgreSQL Extension
+
+### Installation
+
+<Tabs>
+  <Tab title="Ubuntu/Debian">
+    ```bash
+    # Install php-pgsql extension
+    sudo apt install php-pgsql php-mbstring
+    
+    # Restart web server
+    sudo systemctl restart apache2
+    # or
+    sudo systemctl restart php-fpm
+    ```
+  </Tab>
+  
+  <Tab title="CentOS/RHEL">
+    ```bash
+    # Install php-pgsql
+    sudo yum install php-pgsql php-mbstring
+    
+    # Restart web server
+    sudo systemctl restart httpd
+    ```
+  </Tab>
+  
+  <Tab title="Windows">
+    <Steps>
+      <Step title="Edit php.ini">
+        Locate and edit `php.ini` file
+      </Step>
+      
+      <Step title="Enable Extensions">
+        Uncomment these lines:
+        ```ini
+        extension=pgsql
+        extension=pdo_pgsql
+        extension=mbstring
+        ```
+      </Step>
+      
+      <Step title="Restart Server">
+        Restart Apache/IIS/PHP-FPM
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+### Verify Installation
+
+```php
+<?php
+if (function_exists('pg_connect')) {
+    echo "PostgreSQL support is enabled";
+} else {
+    echo "PostgreSQL support is NOT enabled";
+}
+
+phpinfo(); // Check for pgsql section
+?>
+```
+
+## Connection Testing
+
+<Steps>
+  <Step title="Test Database Connection">
+    Create `test_connection.php`:
+    
+    ```php
+    <?php
+    $host = 'localhost';
+    $port = '5434';
+    $dbname = 'seguridad_db';
+    $user = 'postgres';
+    $password = 'your_password';
+    
+    $conn_string = "host=$host port=$port dbname=$dbname " .
+                   "user=$user password=$password";
+    
+    $con = pg_connect($conn_string);
+    
+    if ($con) {
+        echo "✓ Connection successful!<br>";
+        echo "Server version: " . pg_version($con)['server'] . "<br>";
+        
+        // Test query
+        $result = pg_query($con, "SELECT COUNT(*) FROM usuario");
+        if ($result) {
+            $row = pg_fetch_row($result);
+            echo "✓ Query successful! User count: " . $row[0];
+        }
+        
+        pg_close($con);
+    } else {
+        echo "✗ Connection failed: " . pg_last_error();
+    }
+    ?>
+    ```
+  </Step>
+  
+  <Step title="Access via Browser">
+    Navigate to: `http://localhost/test_connection.php`
+  </Step>
+  
+  <Step title="Verify Output">
+    Should display:
+    ```
+    ✓ Connection successful!
+    Server version: 9.x.x
+    ✓ Query successful! User count: 1
+    ```
+  </Step>
+</Steps>
+
+## Backup Procedures
+
+### Manual Backup
+
+<CodeGroup>
+```bash Full Database Backup
+# Backup entire database
+pg_dump -U postgres -p 5434 -d seguridad_db \
+    -F c -b -v -f "seguridad_$(date +%Y%m%d).backup"
+
+# Backup as SQL script
+pg_dump -U postgres -p 5434 seguridad_db \
+    > "seguridad_$(date +%Y%m%d).sql"
+```
+
+```bash Table-Specific Backup
+# Backup specific tables
+pg_dump -U postgres -p 5434 -d seguridad_db \
+    -t usuario -t preventivos -t dependencias \
+    -F c -f "seguridad_core_tables.backup"
+```
+
+```bash Schema Only
+# Backup structure without data
+pg_dump -U postgres -p 5434 -d seguridad_db \
+    --schema-only -f "seguridad_schema.sql"
+```
+</CodeGroup>
+
+### Automated Backup Script
+
+```bash backup_script.sh
+#!/bin/bash
+
+# Configuration
+DB_NAME="seguridad_db"
+DB_USER="postgres"
+DB_PORT="5434"
+BACKUP_DIR="/var/backups/seguridad"
+RETENTION_DAYS=30
+
+# Create backup directory
+mkdir -p $BACKUP_DIR
+
+# Backup filename with timestamp
+BACKUP_FILE="$BACKUP_DIR/seguridad_$(date +%Y%m%d_%H%M%S).backup"
+
+# Perform backup
+pg_dump -U $DB_USER -p $DB_PORT -d $DB_NAME \
+    -F c -b -v -f "$BACKUP_FILE"
+
+if [ $? -eq 0 ]; then
+    echo "Backup successful: $BACKUP_FILE"
+    
+    # Compress backup
+    gzip "$BACKUP_FILE"
+    
+    # Remove old backups
+    find $BACKUP_DIR -name "*.backup.gz" \
+        -mtime +$RETENTION_DAYS -delete
+else
+    echo "Backup failed!"
+    exit 1
+fi
+```
+
+### Schedule Automated Backups
+
+```bash crontab
+# Add to crontab: crontab -e
+
+# Daily backup at 2 AM
+0 2 * * * /path/to/backup_script.sh >> /var/log/seguridad_backup.log 2>&1
+
+# Weekly full backup on Sunday at 3 AM
+0 3 * * 0 pg_dump -U postgres -p 5434 -d seguridad_db \
+    -F c -f "/backups/seguridad_weekly_$(date +\%Y\%m\%d).backup"
+```
+
+## Restore Procedures
+
+<Steps>
+  <Step title="Stop Application">
+    Ensure no users are connected:
+    ```sql
+    SELECT pg_terminate_backend(pid) 
+    FROM pg_stat_activity 
+    WHERE datname = 'seguridad_db';
+    ```
+  </Step>
+  
+  <Step title="Restore Database">
+    ```bash
+    # From custom format backup
+    pg_restore -U postgres -p 5434 -d seguridad_db \
+        -v seguridad_20260305.backup
+    
+    # From SQL script
+    psql -U postgres -p 5434 -d seguridad_db \
+        < seguridad_20260305.sql
+    ```
+  </Step>
+  
+  <Step title="Verify Restoration">
+    ```sql
+    -- Check record counts
+    SELECT 'usuario' as tabla, COUNT(*) FROM usuario
+    UNION ALL
+    SELECT 'preventivos', COUNT(*) FROM preventivos
+    UNION ALL
+    SELECT 'dependencias', COUNT(*) FROM dependencias;
+    ```
+  </Step>
+  
+  <Step title="Restart Application">
+    Test application connectivity and functionality
+  </Step>
+</Steps>
+
+## Performance Optimization
+
+<AccordionGroup>
+  <Accordion title="Indexing Strategy">
+    ```sql
+    -- Create indexes on frequently queried columns
+    CREATE INDEX idx_prev_fecha_dep 
+        ON preventivos(fecha, dependencia);
+    
+    CREATE INDEX idx_prev_delito_fecha 
+        ON preventivos(delito, fecha);
+    
+    -- Analyze tables for query optimization
+    ANALYZE usuario;
+    ANALYZE preventivos;
+    ANALYZE dependencias;
+    ```
+  </Accordion>
+  
+  <Accordion title="Connection Pooling">
+    Consider implementing pgBouncer for connection pooling:
+    
+    ```ini
+    [databases]
+    seguridad_db = host=localhost port=5434 dbname=seguridad_db
+    
+    [pgbouncer]
+    listen_port = 6432
+    listen_addr = localhost
+    auth_type = md5
+    pool_mode = transaction
+    max_client_conn = 100
+    default_pool_size = 20
+    ```
+  </Accordion>
+  
+  <Accordion title="Vacuum and Maintenance">
+    ```sql
+    -- Regular maintenance
+    VACUUM ANALYZE usuario;
+    VACUUM ANALYZE preventivos;
+    
+    -- Full vacuum (requires downtime)
+    VACUUM FULL usuario;
+    
+    -- Auto-vacuum configuration
+    ALTER TABLE preventivos 
+        SET (autovacuum_vacuum_scale_factor = 0.1);
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Security Best Practices
+
+<Warning>
+  **Critical Security Improvements Needed**
+  
+  The current implementation has several security vulnerabilities:
+</Warning>
+
+<AccordionGroup>
+  <Accordion title="1. Use Parameterized Queries">
+    ```php
+    // Current (vulnerable to SQL injection)
+    $sql = "SELECT * FROM usuario WHERE usd='$user' AND pwd='$pass'";
+    
+    // Improved (parameterized)
+    $sql = "SELECT * FROM usuario WHERE usd=$1 AND pwd=$2";
+    $result = pg_query_params($con, $sql, array($user, $pass));
+    ```
+  </Accordion>
+  
+  <Accordion title="2. Hash Passwords">
+    ```php
+    // Store hashed passwords
+    $hashed = password_hash($password, PASSWORD_ARGON2ID);
+    
+    // Update schema
+    ALTER TABLE usuario ALTER COLUMN pwd TYPE VARCHAR(255);
+    ```
+  </Accordion>
+  
+  <Accordion title="3. Restrict Database User">
+    ```sql
+    -- Create application user with limited privileges
+    CREATE USER seguridad_app WITH PASSWORD 'strong_password';
+    
+    -- Grant only necessary permissions
+    GRANT CONNECT ON DATABASE seguridad_db TO seguridad_app;
+    GRANT SELECT, INSERT, UPDATE ON ALL TABLES TO seguridad_app;
+    GRANT USAGE ON ALL SEQUENCES TO seguridad_app;
+    
+    -- Revoke DELETE on critical tables
+    REVOKE DELETE ON usuario FROM seguridad_app;
+    ```
+  </Accordion>
+  
+  <Accordion title="4. Enable SSL Connections">
+    ```ini postgresql.conf
+    ssl = on
+    ssl_cert_file = '/path/to/server.crt'
+    ssl_key_file = '/path/to/server.key'
+    ```
+    
+    ```php PHP Connection
+    $con = pg_connect("host=$host port=$puerto dbname=$dbname " .
+                      "user=$user password=$pass sslmode=require");
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Related Documentation
+
+<CardGroup cols={2}>
+  <Card title="User Management" icon="users" href="/admin/user-management">
+    Managing user accounts in database
+  </Card>
+  
+  <Card title="System Configuration" icon="gear" href="/admin/system-configuration">
+    PHP and web server setup
+  </Card>
+  
+  <Card title="Permissions" icon="shield-check" href="/admin/permissions">
+    Role-based access control
+  </Card>
+  
+  <Card title="Regional Units" icon="building" href="/admin/regional-units">
+    Departmental structure
+  </Card>
+</CardGroup>

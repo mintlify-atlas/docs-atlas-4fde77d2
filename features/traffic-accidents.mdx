@@ -1,0 +1,234 @@
+---
+title: Traffic Accidents
+description: Comprehensive traffic accident reporting and tracking system for recording incidents, victims, and vehicle information
+---
+
+The Traffic Accidents module provides a complete workflow for documenting traffic incidents, managing victim information, tracking injuries, and generating statistical reports.
+
+## Overview
+
+This module enables law enforcement to:
+
+- Record detailed traffic accident information
+- Track victims and their conditions
+- Document vehicle involvement
+- Monitor injury severity levels
+- Generate jurisdictional reports
+- Query accident statistics
+
+## Accident Registration Workflow
+
+### Basic Incident Information
+
+When reporting a traffic accident, the following core details are captured:
+
+<AccordionGroup>
+  <Accordion title="Date and Time">
+    - **Date**: Date of the accident occurrence
+    - **Time**: Exact time of the incident
+    - **Preventive Number**: Case identification number
+    - **Year**: Year of the preventive report
+  </Accordion>
+
+  <Accordion title="Location Details">
+    - **Place (Lugar)**: Exact location of the accident
+    - **Jurisdiction**: Regional unit responsible (UR-1 through UR-15)
+    - **Dependency**: Specific police station or unit
+    - **Road Type (Via)**: Street, Avenue, National Route (R.N.), or Provincial Route (R.P.)
+  </Accordion>
+
+  <Accordion title="Incident Classification">
+    - **Incident Type**: 
+      - Collision with Homicide
+      - Single Vehicle Crash (Despiste)
+      - Occupant Fall
+      - Ravine Accident (Desbarrancamiento)
+  </Accordion>
+</AccordionGroup>
+
+### Victim Information
+
+For each victim involved in the accident:
+
+```php
+// Fields captured:
+- Apellido y Nombre (Last Name and First Name)
+- Edad (Age)
+- Sexo (Gender): F/M
+- Condicion (Condition at time of accident)
+```
+
+**Victim Conditions:**
+
+<CardGroup cols={2}>
+  <Card title="Vehicle Occupants" icon="car">
+    - COND.VEHICULO (Vehicle Driver)
+    - ACOMP.VEHICULO (Vehicle Passenger)
+    - PASAJERO/A (Passenger)
+    - PASAJERO TRACTOR (Tractor Passenger)
+    - PASAJ.OMNIBUS (Bus Passenger)
+  </Card>
+
+  <Card title="Motorcycle & Others" icon="motorcycle">
+    - MOTOCIC.COND. (Motorcycle Driver)
+    - MOTOCIC.ACOMP. (Motorcycle Passenger)
+    - CICLISTA (Cyclist)
+    - PEATON (Pedestrian)
+  </Card>
+</CardGroup>
+
+### Death Classification
+
+The system tracks when fatalities occur:
+
+<Steps>
+  <Step title="Immediate Death">
+    Death occurred at the scene (EN EL ACTO)
+  </Step>
+  <Step title="Subsequent Death">
+    Death occurred after the accident (POSTERIOR)
+  </Step>
+</Steps>
+
+## Injury Tracking System
+
+### Lesionados (Injured Persons Module)
+
+For accidents with injuries, a separate detailed tracking form captures:
+
+<Tabs>
+  <Tab title="Vehicle Data">
+    **Vehicle Information:**
+    - Date and time of incident
+    - Regional unit and dependency
+    - Incident type:
+      - COLISION SIMPLE (Simple Collision)
+      - COLISION CON LESIONADOS (Collision with Injuries)
+    - License plate (Dominio)
+    - Vehicle make and model
+    - Location
+    - Road type
+  </Tab>
+
+  <Tab title="Victim Details">
+    **Injured Person Information:**
+    - DNI (National ID)
+    - Full name
+    - Gender
+    - Age
+    - Injury severity level
+    - Victim condition (role in accident)
+  </Tab>
+</Tabs>
+
+### Injury Severity Levels
+
+The system classifies injuries into five categories:
+
+<CardGroup cols={3}>
+  <Card title="LEVES" icon="bandage">
+    Minor injuries
+  </Card>
+  <Card title="GRAVES" icon="user-injured">
+    Serious injuries
+  </Card>
+  <Card title="GRAVISIMOS" icon="heart-pulse">
+    Critical/life-threatening injuries
+  </Card>
+  <Card title="SIN LESIONES" icon="check">
+    No injuries
+  </Card>
+  <Card title="FALLECIDOS" icon="skull">
+    Fatalities
+  </Card>
+</CardGroup>
+
+## Data Management
+
+### Record Operations
+
+<CodeGroup>
+```php Update Record
+// Modify existing accident record
+UPDATE hechos SET 
+  via='$via', 
+  sexo='$sexo',
+  muerte='$estado',
+  juridiccion='$juridiccion',
+  condicion='$condicion',
+  apellido='$apellido',
+  lugar='$lugar',
+  edad=$edad,
+  fecha='$fecha' 
+WHERE cod = '$cod'
+```
+
+```php Delete Record
+// Remove accident record
+DELETE FROM hechos 
+WHERE cod = '$cod'
+```
+
+```php Insert Injury Record
+// Add injured person to database
+INSERT INTO lesionados_accidente_transito 
+VALUES (
+  '$fecha','$ur','$depe','$dominio',
+  '$caracteristicas','$lugar','$tipo_siniestro',
+  '$via','$apeynom','$dni','$sexo','$tipo',
+  '$edad','$condicion'
+)
+```
+</CodeGroup>
+
+## Statistical Queries
+
+The system supports various queries for generating reports:
+
+<AccordionGroup>
+  <Accordion title="Jurisdictional Reports">
+    Query accidents by Regional Unit (UR-1 through UR-15) to analyze incident patterns in specific jurisdictions.
+  </Accordion>
+
+  <Accordion title="Temporal Analysis">
+    Filter accidents by date ranges to identify trends and peak incident periods.
+  </Accordion>
+
+  <Accordion title="Injury Statistics">
+    Generate reports on injury severity distribution and fatality rates.
+  </Accordion>
+
+  <Accordion title="Road Type Analysis">
+    Compare accident frequencies across different road types (streets, avenues, highways).
+  </Accordion>
+</AccordionGroup>
+
+## Best Practices
+
+<Note>
+**Data Accuracy**: Ensure all dates, times, and locations are accurate as this information is critical for statistical analysis and legal proceedings.
+</Note>
+
+<Warning>
+**Duplicate Prevention**: The system validates entries to prevent duplicate accident records. Always search for existing reports before creating new entries.
+</Warning>
+
+<Tip>
+**Victim Documentation**: For accidents with multiple victims, create separate injury records for each person to maintain detailed tracking.
+</Tip>
+
+## Form Validation
+
+The accident reporting form includes validation for:
+
+- Date format (DD/MM/YYYY)
+- Required fields: date, location, victim information
+- Jurisdiction selection
+- Road type specification
+- Victim condition classification
+
+## Related Modules
+
+- [Homicides](/features/homicides) - For traffic accidents resulting in criminal investigation
+- [Vehicle Tracking](/features/vehicle-tracking) - For stolen or suspicious vehicles involved in accidents
+- [Statistics Dashboard](/features/statistics) - For comprehensive accident data analysis
